@@ -21,7 +21,7 @@ ALLOWED_HOSTS = [
     host.strip()
     for host in os.getenv(
         "DJANGO_ALLOWED_HOSTS",
-        "localhost,127.0.0.1,.abrhapaas.com,.liara.run",
+        "localhost,127.0.0.1,.abrhapaas.com,radisonmelk.ir,www.radisonmelk.ir",
     ).split(",")
     if host.strip()
 ]
@@ -30,7 +30,7 @@ CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.getenv(
         "DJANGO_CSRF_TRUSTED_ORIGINS",
-        "https://*.abrhapaas.com",
+        "https://*.abrhapaas.com,https://radisonmelk.ir,https://www.radisonmelk.ir",
     ).split(",")
     if origin.strip()
 ]

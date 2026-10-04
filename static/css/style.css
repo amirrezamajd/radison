@@ -464,10 +464,55 @@ img { display: block; max-width: 100%; }
 .thumbs img { width: 100%; height: 64px; object-fit: cover; }
 
 .site-footer {
-  padding: 1.5rem;
+  padding: 1.8rem 1.2rem 2.2rem;
   text-align: center;
   color: var(--ink-soft);
   border-top: 1px solid rgba(15, 76, 69, 0.08);
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+}
+
+.footer-brand {
+  font-weight: 600;
+  color: var(--sea);
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-links a {
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  opacity: 0.9;
+}
+
+.footer-links a:hover {
+  color: var(--sea);
+  opacity: 1;
+}
+
+.field textarea {
+  width: 100%;
+  border: 1px solid rgba(15, 76, 69, 0.18);
+  border-radius: 12px;
+  padding: 0.85rem 0.95rem;
+  background: white;
+  outline: none;
+  resize: vertical;
+  min-height: 96px;
+  font: inherit;
+}
+
+.field textarea:focus {
+  border-color: var(--lagoon);
+  box-shadow: 0 0 0 3px rgba(31, 122, 109, 0.12);
 }
 
 .admin-page {

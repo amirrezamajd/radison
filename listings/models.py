@@ -1,4 +1,38 @@
+from django.conf import settings
 from django.db import models
+
+
+class AdminJoinRequest(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", "در انتظار تأیید"
+        APPROVED = "approved", "تأیید شده"
+        REJECTED = "rejected", "رد شده"
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="admin_join_request",
+    )
+    full_name = models.CharField("نام و نام خانوادگی", max_length=120)
+    phone = models.CharField("شماره تماس", max_length=20, blank=True)
+    note = models.TextField("توضیحات", blank=True)
+    status = models.CharField(
+        "وضعیت",
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+        db_index=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "درخواست عضویت ادمین"
+        verbose_name_plural = "درخواست‌های عضویت ادمین"
+
+    def __str__(self):
+        return f"{self.full_name} ({self.user.username}) - {self.get_status_display()}"
 
 
 class Property(models.Model):

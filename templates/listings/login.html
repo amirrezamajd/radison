@@ -7,11 +7,11 @@
   <form class="admin-card narrow" method="post">
     {% csrf_token %}
     <h1>ورود ادمین رادیسون</h1>
-    <p class="sub">برای استخراج ملک از CRM وارد شوید.</p>
+    <p class="sub">برای استخراج ملک از CRM وارد شوید. اگر هنوز حساب ندارید، ثبت‌نام کنید تا پس از تأیید ادمین اصلی فعال شود.</p>
 
     <label class="field">
       <span>نام کاربری</span>
-      <input type="text" name="username" value="admin" autocomplete="username" required>
+      <input type="text" name="username" autocomplete="username" required>
     </label>
 
     <label class="field">
@@ -21,6 +21,7 @@
 
     <div class="admin-actions">
       <button class="btn btn-primary" type="submit">ورود</button>
+      <a class="btn btn-ghost" href="{% url 'panel_register' %}">ثبت‌نام ادمین جدید</a>
       <a class="btn btn-ghost" href="{% url 'home' %}">بازگشت به سایت</a>
     </div>
 

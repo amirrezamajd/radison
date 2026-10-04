@@ -4,7 +4,6 @@
 {% block body %}
 <header class="topbar">
   <strong>RADISON</strong>
-  <a href="{% url 'panel_login' %}">ورود ادمین</a>
 </header>
 
 <section class="hero">
@@ -15,7 +14,6 @@
     <p>انتخابی از فایل‌های منتخب کارگزاری املاک رادیسون؛ با یک کلیک جزئیات و گالری هر ملک را ببینید.</p>
     <div class="cta-row">
       <a class="btn btn-primary" href="#listings">مشاهده ملک‌ها</a>
-      <a class="btn btn-ghost" href="{% url 'panel_login' %}">پنل مدیریت</a>
     </div>
   </div>
 </section>
@@ -49,12 +47,19 @@
     </div>
   {% else %}
     <div class="empty-state">
-      هنوز ملکی بارگذاری نشده است. از پنل ادمین لینک CRM را وارد کنید تا استخراج شود.
+      هنوز ملکی بارگذاری نشده است. به‌زودی فایل‌های جدید اضافه می‌شود.
     </div>
   {% endif %}
 </section>
 
-<footer class="site-footer">کارگزاری املاک رادیسون</footer>
+<footer class="site-footer">
+  <div class="footer-brand">کارگزاری املاک رادیسون</div>
+  <div class="footer-links">
+    <a href="{% url 'panel_login' %}">ورود ادمین</a>
+    <span aria-hidden="true">·</span>
+    <a href="{% url 'panel_register' %}">ثبت‌نام ادمین</a>
+  </div>
+</footer>
 
 <div class="modal-backdrop" id="propertyModal" role="presentation">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
