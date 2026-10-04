@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}ورود ادمین | املاک رادیسون{% endblock %}
+
+{% block body %}
+<div class="admin-page">
+  <form class="admin-card narrow" method="post">
+    {% csrf_token %}
+    <h1>ورود ادمین رادیسون</h1>
+    <p class="sub">برای استخراج ملک از CRM وارد شوید.</p>
+
+    <label class="field">
+      <span>نام کاربری</span>
+      <input type="text" name="username" value="admin" autocomplete="username" required>
+    </label>
+
+    <label class="field">
+      <span>رمز عبور</span>
+      <input type="password" name="password" autocomplete="current-password" required>
+    </label>
+
+    <div class="admin-actions">
+      <button class="btn btn-primary" type="submit">ورود</button>
+      <a class="btn btn-ghost" href="{% url 'home' %}">بازگشت به سایت</a>
+    </div>
+
+    {% if error %}
+      <div class="status error">{{ error }}</div>
+    {% endif %}
+  </form>
+</div>
+{% endblock %}

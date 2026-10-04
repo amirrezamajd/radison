@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body %}
+<header class="topbar">
+  <strong>RADISON</strong>
+  <a href="{% url 'panel_login' %}">ورود ادمین</a>
+</header>
+
+<section class="hero">
+  <div class="hero-content">
+    <span class="brand-en">Radison</span>
+    <span class="brand-fa">املاک رادیسون</span>
+    <h1>ویلا و فایل‌های اختصاصی شمال</h1>
+    <p>انتخابی از فایل‌های منتخب کارگزاری املاک رادیسون؛ با یک کلیک جزئیات و گالری هر ملک را ببینید.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#listings">مشاهده ملک‌ها</a>
+      <a class="btn btn-ghost" href="{% url 'panel_login' %}">پنل مدیریت</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="listings">
+  <div class="section-head">
+    <h2>فایل‌های موجود</h2>
+    <p>برای دیدن تصاویر و مشخصات کامل، روی هر ملک کلیک کنید.</p>
+  </div>
+
+  {% if properties %}
+    <div class="property-grid">
+      {% for property in properties %}
+        <button type="button" class="property-tile" data-property-id="{{ property.id }}">
+          {% with cover=property.images.first %}
+            {% if cover %}
+              <img src="{{ cover.image.url }}" alt="{{ property.title }}">
+            {% endif %}
+          {% endwith %}
+          <div class="property-meta">
+            <h3>{{ property.title }}</h3>
+            <div class="price">{{ property.price_text }}</div>
+            <div class="chip-row">
+              {% if property.property_type %}<span class="chip">{{ property.property_type }}</span>{% endif %}
+              {% if property.deal_type %}<span class="chip">{{ property.deal_type }}</span>{% endif %}
+              {% if property.specs.2 %}<span class="chip">{{ property.specs.2 }}</span>{% endif %}
+            </div>
+          </div>
+        </button>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      هنوز ملکی بارگذاری نشده است. از پنل ادمین لینک CRM را وارد کنید تا استخراج شود.
+    </div>
+  {% endif %}
+</section>
+
+<footer class="site-footer">کارگزاری املاک رادیسون</footer>
+
+<div class="modal-backdrop" id="propertyModal" role="presentation">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-gallery">
+      <img id="modalImage" src="" alt="">
+      <button type="button" class="gallery-nav prev" id="modalPrev" aria-label="قبلی">›</button>
+      <button type="button" class="gallery-nav next" id="modalNext" aria-label="بعدی">‹</button>
+      <div class="gallery-count" id="modalCount"></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-top">
+        <div>
+          <div class="chip-row" id="modalChips" style="margin-bottom:0.7rem;"></div>
+          <h2 id="modalTitle"></h2>
+          <p class="modal-price">
+            <span id="modalPrice"></span>
+            <small id="modalPriceMeter"></small>
+          </p>
+        </div>
+        <button type="button" class="close-btn" id="modalClose" aria-label="بستن">✕</button>
+      </div>
+      <div class="specs" id="modalSpecs"></div>
+      <div class="thumbs" id="modalThumbs"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ properties_json|json_script:"properties-data" }}
+<script>
+  window.RADISON_PROPERTIES = JSON.parse(document.getElementById("properties-data").textContent);
+</script>
+<script src="{% static 'js/home.js' %}"></script>
+{% endblock %}
