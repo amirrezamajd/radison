@@ -10,24 +10,28 @@ def env_bool(name, default=False):
     return os.getenv(name, str(default)).lower() in {"1", "true", "yes", "on"}
 
 
-SECRET_KEY = os.getenv(
-    "DJANGO_SECRET_KEY",
-    "django-insecure-local-only-change-this-in-production",
+SECRET_KEY = (
+    os.getenv("DJANGO_SECRET_KEY")
+    or os.getenv("django_secret_key")
+    or "django-insecure-local-only-change-this-in-production"
 )
-DEBUG = env_bool("DJANGO_DEBUG", "PORT" not in os.environ)
+DEBUG = env_bool("DJANGO_DEBUG", env_bool("DEBUG", False))
 
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.getenv(
         "DJANGO_ALLOWED_HOSTS",
-        "localhost,127.0.0.1,.liara.run",
+        "localhost,127.0.0.1,.abrhapaas.com,.liara.run",
     ).split(",")
     if host.strip()
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
-    for origin in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
+    for origin in os.getenv(
+        "DJANGO_CSRF_TRUSTED_ORIGINS",
+        "https://*.abrhapaas.com",
+    ).split(",")
     if origin.strip()
 ]
 INSTALLED_APPS = [
