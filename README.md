@@ -26,3 +26,48 @@ python manage.py runserver
 `https://crmamlak.app/p/82nmimfhqo`
 
 عنوان، قیمت، مشخصات و تصاویر استخراج و در سایت ذخیره می‌شوند.
+
+## استقرار روی سرور
+
+پروژه برای Python 3.12 و SQLite موجود در سرویس‌های میزبانی آماده شده است.
+Django روی نسخه LTS 5.2 پین شده و فایل‌های static با WhiteNoise سرو می‌شوند.
+
+متغیرهای محیطی ضروری:
+
+```text
+DJANGO_SECRET_KEY=<یک مقدار طولانی و تصادفی>
+DJANGO_DEBUG=False
+DJANGO_ALLOWED_HOSTS=your-domain.ir,www.your-domain.ir,.liara.run
+DJANGO_CSRF_TRUSTED_ORIGINS=https://your-domain.ir,https://www.your-domain.ir
+```
+
+اگر SQLite استفاده می‌کنید، دیتابیس و تصاویر باید روی دیسک دائمی باشند:
+
+```text
+SQLITE_PATH=/data/db.sqlite3
+MEDIA_ROOT=/data/media
+DJANGO_SERVE_MEDIA=True
+```
+
+اگر PostgreSQL دارید، به‌جای `SQLITE_PATH` مقدار `DATABASE_URL` را تنظیم کنید:
+
+```text
+DATABASE_URL=postgresql://user:password@host:5432/database
+```
+
+دستورات build/release:
+
+```bash
+python manage.py migrate
+python manage.py collectstatic --noinput
+python manage.py createsuperuser
+```
+
+دستور اجرا:
+
+```bash
+gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 180
+```
+
+قبل از انتشار نهایی، رمز کاربر ادمین آزمایشی را تغییر دهید. فایل نمونه
+تنظیمات در `.env.example` قرار دارد.
