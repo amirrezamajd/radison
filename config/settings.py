@@ -127,10 +127,12 @@ STORAGES = {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        # Non-manifest storage avoids hard 500s when a hashed file is missing after deploy.
         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
+# Serve files from STATICFILES_DIRS even if collectstatic was skipped on the host.
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = DEBUG
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", str(_default_media)))
