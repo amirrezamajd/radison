@@ -1,53 +1,104 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block title %}املاک رادیسون | سرمایه‌گذاری در سرخرود مازندران{% endblock %}
+
 {% block body %}
 <header class="topbar">
   <a class="brand-lockup" href="#top" aria-label="رادیسون">
     <img src="{% static 'img/logo-r.png' %}" alt="لوگو رادیسون" class="brand-mark">
     <span>RADISON</span>
   </a>
-  <a class="top-link" href="#contact">تماس</a>
+  <nav class="top-nav" aria-label="منوی اصلی">
+    <a class="top-link" href="#about">سرخرود</a>
+    <a class="top-link" href="#why">مزایا</a>
+    <a class="top-link" href="#listings">ملک‌ها</a>
+    <a class="top-link" href="#contact">تماس</a>
+  </nav>
 </header>
 
 <section class="hero" id="top">
   <div class="hero-content">
     <img src="{% static 'img/logo-r.png' %}" alt="" class="hero-logo" aria-hidden="true">
     <span class="brand-en">Radison</span>
-    <span class="brand-fa">گروه سرمایه‌گذاری و مهندسی املاک</span>
-    <h1>سرمایه‌گذاری املاک منطقه آزاد ساحلی مازندران</h1>
-    <p>مشارکت، خرید و فروش در نوار ساحلی مازندران؛ فایل‌های منتخب را ببینید و مستقیم با تیم رادیسون در ارتباط باشید.</p>
+    <span class="brand-fa">گروه سرمایه‌گذاری و مهندسی املاک · سرخرود</span>
+    <h1>سرمایه‌گذاری املاک در شهر ساحلی سرخرود</h1>
+    <p>در نوار جنوبی دریای خزر، بین محمودآباد و فریدون‌کنار؛ جایی که ساحل باز، دسترسی از تهران و تقاضای ویلا بازار ملک را زنده نگه می‌دارد.</p>
     <div class="cta-row">
       <a class="btn btn-primary" href="#listings">مشاهده ملک‌ها</a>
-      <a class="btn btn-ghost" href="#why">چرا منطقه آزاد؟</a>
+      <a class="btn btn-ghost" href="#why">چرا سرخرود؟</a>
     </div>
+  </div>
+</section>
+
+<section class="section about" id="about">
+  <div class="section-head">
+    <h2>سرخرود کجاست؟</h2>
+    <p>مرکز بخش سرخرود در شهرستان محمودآباد؛ شهر توریستی کوچکی روی دهانه رودخانه هراز به دریای خزر.</p>
+  </div>
+  <div class="about-layout">
+    <div class="about-copy">
+      <p>سرخرود از غرب به محمودآباد، از شرق به فریدون‌کنار، از شمال به خزر و از جنوب به سمت آمل محدود می‌شود. فاصله تا تهران حدود ۲۰۰ تا ۲۱۰ کیلومتر است و از مسیر هراز معمولاً حدود سه ساعت راه است؛ به همین خاطر مقصد محبوب آخر هفته‌های تهرانی‌هاست.</p>
+      <p>مساحت شهر حدود ۵۴۰ هکتار و نوار ساحلی‌اش حدود ۱۳ کیلومتر است. ساحل ماسه‌ای حدود ۵ کیلومتر طول دارد و برخلاف بسیاری از سواحل شمال، حریم قانونی ۶۰ متری تا دریا رعایت شده؛ برای همین پهنه ساحل عمومی و باز مانده است.</p>
+      <p>جمعیت بومی حدود ۱۲ هزار نفر است، اما در پیک گردشگری و تعطیلات با حضور مالکان ویلا و مسافران به بیش از ۳۰ هزار نفر می‌رسد. زمستان‌ها تالاب سرخرود میزبان هزاران قوی مهاجر است و ترکیب ساحل، آب‌بندان و جنگل شیلات هویت طبیعی این شهر را ساخته است.</p>
+    </div>
+    <dl class="fact-list">
+      <div>
+        <dt>موقعیت</dt>
+        <dd>ساحل خزر · دهانه هراز · مازندران</dd>
+      </div>
+      <div>
+        <dt>دسترسی از تهران</dt>
+        <dd>حدود ۲۰۰–۲۱۰ کیلومتر · مسیر هراز</dd>
+      </div>
+      <div>
+        <dt>نوار ساحلی</dt>
+        <dd>حدود ۱۳ کیلومتر · ساحل ماسه‌ای باز</dd>
+      </div>
+      <div>
+        <dt>اقلیم</dt>
+        <dd>معتدل خزری · تابستان مرطوب · زمستان ملایم</dd>
+      </div>
+    </dl>
   </div>
 </section>
 
 <section class="section why" id="why">
   <div class="section-head">
-    <h2>چرا منطقه آزاد ساحلی؟</h2>
-    <p>تمرکز رادیسون روی فرصت‌های سرمایه‌گذاری و فایل‌های واقعی نوار ساحلی مازندران است.</p>
+    <h2>چرا سرمایه‌گذاری در سرخرود؟</h2>
+    <p>رادیسون روی فرصت‌های واقعی خرید، فروش و مشارکت در همین نوار ساحلی تمرکز دارد؛ نه شعار کلی شمال.</p>
   </div>
-  <div class="why-grid">
+  <div class="why-grid why-grid-wide">
     <article class="why-item">
-      <strong>موقعیت ساحلی</strong>
-      <p>دسترسی به نوار ساحلی و پروژه‌های شاخص منطقه آزاد و اطراف آن.</p>
+      <strong>ساحل باز و متمایز</strong>
+      <p>رعایت حریم ۶۰ متری باعث شده ساحل سرخرود برای عموم باز بماند؛ همین ویژگی هویت گردشگری و ارزش املاک ساحلی را تقویت می‌کند.</p>
     </article>
     <article class="why-item">
-      <strong>سرمایه‌گذاری هدفمند</strong>
-      <p>انتخاب فایل با نگاه مشارکت، خرید و فروش؛ نه فقط نمایش عمومی.</p>
+      <strong>نزدیکی به تهران</strong>
+      <p>با حدود سه ساعت مسیر از هراز، سرخرود برای اقامت آخر هفته، اجاره کوتاه‌مدت و تقاضای ویلا از بازار تهران جذاب است.</p>
     </article>
     <article class="why-item">
-      <strong>همراهی تخصصی</strong>
-      <p>تیم مهندسی و مشاور املاک رادیسون از انتخاب تا معامله کنار شماست.</p>
+      <strong>تقاضای گردشگری پایدار</strong>
+      <p>تفریحات آبی، اسب‌سواری، بازار محلی، جنگل شیلات و پرنده‌نگری زمستانی جریان رفت‌وآمد را در فصول مختلف نگه می‌دارد.</p>
+    </article>
+    <article class="why-item">
+      <strong>بازار ویلا و زمین</strong>
+      <p>محدوده شمالی نزدیک ساحل تقاضای لوکس‌تری دارد؛ بخش‌های جنوبی‌تر به سمت آمل برای بودجه‌های متنوع‌تر فرصت می‌سازند.</p>
+    </article>
+    <article class="why-item">
+      <strong>نقدشوندگی نسبی در مازندران</strong>
+      <p>ورود سرمایه تهرانی و گردشگرپذیری مازندران معمولاً سرعت فروش و اجاره را نسبت به بازارهای آرام‌تر شمال بالاتر نگه می‌دارد.</p>
+    </article>
+    <article class="why-item">
+      <strong>همراهی تخصصی رادیسون</strong>
+      <p>از انتخاب فایل تا بررسی سند، کاربری و معامله؛ تیم مهندسی و مشاور املاک رادیسون کنار شماست.</p>
     </article>
   </div>
 </section>
 
 <section class="section" id="listings">
   <div class="section-head">
-    <h2>فایل‌های موجود</h2>
+    <h2>فایل‌های موجود در سرخرود</h2>
     <p>برای دیدن تصاویر و مشخصات کامل، روی هر ملک کلیک کنید.</p>
   </div>
 
@@ -74,7 +125,7 @@
     </div>
   {% else %}
     <div class="empty-state">
-      هنوز ملکی بارگذاری نشده است. به‌زودی فایل‌های جدید اضافه می‌شود.
+      هنوز ملکی بارگذاری نشده است. به‌زودی فایل‌های سرخرود اضافه می‌شود.
     </div>
   {% endif %}
 </section>
@@ -82,8 +133,8 @@
 <section class="contact" id="contact">
   <div class="contact-inner">
     <div>
-      <h2>ارتباط با رادیسون</h2>
-      <p>برای بازدید، مشاوره سرمایه‌گذاری یا فایل اختصاصی با ما در تماس باشید.</p>
+      <h2>ارتباط با رادیسون در سرخرود</h2>
+      <p>برای بازدید حضوری، مشاوره سرمایه‌گذاری یا فایل اختصاصی ویلا و زمین در سرخرود با ما در تماس باشید.</p>
     </div>
     <div class="contact-actions">
       <a class="btn btn-primary" href="https://wa.me/989022259493" target="_blank" rel="noopener">واتساپ</a>
@@ -95,7 +146,7 @@
 
 <footer class="site-footer">
   <img src="{% static 'img/logo-r.png' %}" alt="" class="footer-logo" aria-hidden="true">
-  <div class="footer-brand">کارگزاری املاک رادیسون · Real estate Sorkhroud</div>
+  <div class="footer-brand">کارگزاری املاک رادیسون · سرخرود، مازندران</div>
   <a class="footer-social" href="https://instagram.com/radison.melk" target="_blank" rel="noopener">instagram.com/radison.melk</a>
   <div class="footer-links">
     <a href="{% url 'panel_login' %}">ورود ادمین</a>

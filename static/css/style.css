@@ -61,10 +61,19 @@ img { display: block; max-width: 100%; }
   filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.28));
 }
 
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .top-link {
   opacity: 0.92;
   border-bottom: 1px solid rgba(255, 255, 255, 0.35);
   padding-bottom: 0.1rem;
+  font-size: 0.95rem;
 }
 
 .hero {
@@ -228,6 +237,10 @@ img { display: block; max-width: 100%; }
   gap: 1.4rem 2rem;
 }
 
+.why-grid-wide {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .why-item {
   padding-top: 0.4rem;
   border-top: 3px solid var(--orange);
@@ -236,6 +249,9 @@ img { display: block; max-width: 100%; }
 
 .why-item:nth-child(2) { animation-delay: 90ms; }
 .why-item:nth-child(3) { animation-delay: 180ms; }
+.why-item:nth-child(4) { animation-delay: 240ms; }
+.why-item:nth-child(5) { animation-delay: 300ms; }
+.why-item:nth-child(6) { animation-delay: 360ms; }
 
 .why-item strong {
   display: block;
@@ -248,6 +264,52 @@ img { display: block; max-width: 100%; }
   margin: 0;
   color: var(--ink-soft);
   line-height: 1.85;
+}
+
+.about-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(240px, 0.8fr);
+  gap: 2.4rem;
+  align-items: start;
+}
+
+.about-copy {
+  display: grid;
+  gap: 1rem;
+}
+
+.about-copy p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.95;
+  font-size: 1.02rem;
+}
+
+.fact-list {
+  margin: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.fact-list > div {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(10, 127, 135, 0.18);
+}
+
+.fact-list dt {
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--orange);
+  font-size: 0.92rem;
+  margin-bottom: 0.25rem;
+}
+
+.fact-list dd {
+  margin: 0;
+  color: var(--teal-ink);
+  font-weight: 600;
+  line-height: 1.7;
 }
 
 .property-grid {
@@ -859,7 +921,10 @@ img { display: block; max-width: 100%; }
 }
 
 @media (max-width: 860px) {
-  .why-grid { grid-template-columns: 1fr; }
+  .why-grid,
+  .why-grid-wide { grid-template-columns: 1fr; }
+  .about-layout { grid-template-columns: 1fr; gap: 1.6rem; }
+  .top-nav { gap: 0.7rem; }
 }
 
 @media (max-width: 720px) {
