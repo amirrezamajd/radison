@@ -126,6 +126,7 @@
               {% if property.property_type %}<span class="chip">{{ property.property_type }}</span>{% endif %}
               {% if property.deal_type %}<span class="chip">{{ property.deal_type }}</span>{% endif %}
               {% if property.specs.2 %}<span class="chip">{{ property.specs.2 }}</span>{% endif %}
+              {% if property.virtual_tour %}<span class="chip chip-tour">بازدید مجازی</span>{% endif %}
             </div>
           </div>
         </button>
@@ -196,6 +197,9 @@
         <button type="button" class="close-btn" id="modalClose" aria-label="بستن">✕</button>
       </div>
       <div class="specs" id="modalSpecs"></div>
+      <div id="modalTourWrap" class="modal-tour-wrap" hidden>
+        <a id="modalTourLink" class="btn btn-primary modal-tour-btn" href="#" target="_blank" rel="noopener">مشاهده بازدید مجازی</a>
+      </div>
       <div class="thumbs" id="modalThumbs"></div>
     </div>
   </div>

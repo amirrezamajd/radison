@@ -764,9 +764,105 @@ img { display: block; max-width: 100%; }
 }
 
 .field textarea:focus,
-.field input:focus {
+.field input:focus,
+.field select:focus {
   border-color: var(--teal);
   box-shadow: 0 0 0 3px rgba(10, 127, 135, 0.12);
+}
+
+.field select {
+  width: 100%;
+  border: 1px solid rgba(10, 127, 135, 0.18);
+  border-radius: 12px;
+  padding: 0.85rem 0.95rem;
+  background: white;
+  outline: none;
+}
+
+.panel-section {
+  margin-top: 1.6rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid rgba(10, 127, 135, 0.12);
+}
+
+.panel-section:first-of-type {
+  margin-top: 0.4rem;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.panel-subtitle {
+  margin: 0 0 1rem;
+  font-size: 1.2rem;
+  color: var(--teal-ink);
+}
+
+.tour-item-mark {
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #065f66, #0a7f87);
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.tour-assigned {
+  margin-top: 0.35rem !important;
+  color: var(--teal-deep) !important;
+}
+
+.tour-assigned a {
+  color: var(--orange);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.property-item {
+  align-items: start;
+}
+
+.property-item-body {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.assign-tour-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.45rem;
+}
+
+.assign-tour-form select {
+  flex: 1 1 180px;
+  border: 1px solid rgba(10, 127, 135, 0.18);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  background: white;
+}
+
+.assign-tour-form .btn-ghost {
+  color: var(--teal-ink);
+  border-color: rgba(10, 127, 135, 0.2);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.55rem 0.9rem;
+}
+
+.chip-tour {
+  background: rgba(255, 87, 0, 0.92);
+  color: white;
+}
+
+.modal-tour-wrap {
+  margin: 1rem 0 0.4rem;
+}
+
+.modal-tour-btn {
+  width: 100%;
+  text-decoration: none;
 }
 
 .admin-page {

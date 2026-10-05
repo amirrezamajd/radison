@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 from django.utils import timezone
 
-from .models import AdminJoinRequest, Property, PropertyImage
+from .models import AdminJoinRequest, Property, PropertyImage, VirtualTour
 
 
 class PropertyImageInline(admin.TabularInline):
@@ -9,10 +9,19 @@ class PropertyImageInline(admin.TabularInline):
     extra = 0
 
 
+@admin.register(VirtualTour)
+class VirtualTourAdmin(admin.ModelAdmin):
+    list_display = ("name", "slug", "created_at")
+    search_fields = ("name", "slug")
+    readonly_fields = ("slug", "storage_dir", "created_at")
+
+
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = ("title", "price_text", "property_type", "deal_type", "updated_at")
+    list_display = ("title", "price_text", "property_type", "deal_type", "virtual_tour", "updated_at")
     search_fields = ("title", "source_token", "source_url")
+    list_filter = ("virtual_tour",)
+    autocomplete_fields = ("virtual_tour",)
     inlines = [PropertyImageInline]
 
 

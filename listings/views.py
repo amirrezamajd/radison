@@ -5,15 +5,17 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
+from django.views.static import serve
 
-from .models import AdminJoinRequest, Property
+from .models import AdminJoinRequest, Property, VirtualTour
 from .scrape import import_property_from_url
+from .tours import TourUploadError, delete_tour_files, extract_tour_zip
 
 User = get_user_model()
 
 
 def home(request):
-    properties = Property.objects.prefetch_related("images").all()
+    properties = Property.objects.prefetch_related("images").select_related("virtual_tour").all()
     payload = []
     for item in properties:
         payload.append(
@@ -26,6 +28,8 @@ def home(request):
                 "deal_type": item.deal_type,
                 "specs": item.specs,
                 "images": [image.image.url for image in item.images.all()],
+                "virtual_tour_url": item.virtual_tour_url,
+                "virtual_tour_name": item.virtual_tour.name if item.virtual_tour_id else "",
             }
         )
     return render(
@@ -137,8 +141,16 @@ def panel(request):
         logout(request)
         return redirect("panel_login")
 
-    properties = Property.objects.prefetch_related("images").all()
-    return render(request, "listings/panel.html", {"properties": properties})
+    properties = Property.objects.prefetch_related("images").select_related("virtual_tour").all()
+    tours = VirtualTour.objects.all()
+    return render(
+        request,
+        "listings/panel.html",
+        {
+            "properties": properties,
+            "tours": tours,
+        },
+    )
 
 
 @login_required(login_url="panel_login")
@@ -151,8 +163,18 @@ def panel_extract(request):
     if not url:
         return JsonResponse({"ok": False, "error": "لینک ملک را وارد کنید"}, status=400)
 
+    tour_id = (request.POST.get("virtual_tour_id") or "").strip()
+    selected_tour = None
+    if tour_id:
+        selected_tour = VirtualTour.objects.filter(pk=tour_id).first()
+        if selected_tour is None:
+            return JsonResponse({"ok": False, "error": "بازدید مجازی انتخاب‌شده پیدا نشد"}, status=400)
+
     try:
         property_obj = import_property_from_url(url)
+        if selected_tour is not None:
+            property_obj.virtual_tour = selected_tour
+            property_obj.save(update_fields=["virtual_tour", "updated_at"])
     except Exception as exc:  # noqa: BLE001 - surface scrape errors to UI
         return JsonResponse({"ok": False, "error": str(exc)}, status=400)
 
@@ -165,9 +187,93 @@ def panel_extract(request):
                 "price_text": property_obj.price_text,
                 "images_count": property_obj.images.count(),
                 "cover": property_obj.cover_image,
+                "virtual_tour_url": property_obj.virtual_tour_url,
             },
         }
     )
+
+
+@login_required(login_url="panel_login")
+@require_POST
+def panel_tour_upload(request):
+    if not request.user.is_staff:
+        messages.error(request, "دسترسی غیرمجاز")
+        return redirect("panel_login")
+
+    name = (request.POST.get("name") or "").strip()
+    uploaded = request.FILES.get("tour_zip")
+    if not name:
+        messages.error(request, "نام بازدید مجازی را وارد کنید.")
+        return redirect("panel")
+    if not uploaded:
+        messages.error(request, "فایل ZIP بازدید مجازی را انتخاب کنید.")
+        return redirect("panel")
+    if not uploaded.name.lower().endswith(".zip"):
+        messages.error(request, "فقط فایل ZIP پذیرفته می‌شود. پوشه daya را زیپ کنید.")
+        return redirect("panel")
+
+    slug = VirtualTour.make_unique_slug(name)
+    try:
+        storage_dir = extract_tour_zip(uploaded, slug)
+    except TourUploadError as exc:
+        messages.error(request, str(exc))
+        return redirect("panel")
+
+    tour = VirtualTour.objects.create(name=name, slug=slug, storage_dir=storage_dir)
+    messages.success(
+        request,
+        f"بازدید مجازی «{tour.name}» آپلود شد. لینک: {tour.get_absolute_url()}",
+    )
+    return redirect("panel")
+
+
+@login_required(login_url="panel_login")
+@require_POST
+def panel_tour_delete(request, pk):
+    if not request.user.is_staff:
+        messages.error(request, "دسترسی غیرمجاز")
+        return redirect("panel_login")
+
+    tour = get_object_or_404(VirtualTour, pk=pk)
+    name = tour.name
+    storage_dir = tour.storage_dir
+    tour.delete()
+    delete_tour_files(storage_dir)
+    messages.success(request, f"بازدید مجازی «{name}» حذف شد.")
+    return redirect("panel")
+
+
+@login_required(login_url="panel_login")
+@require_POST
+def panel_assign_tour(request, pk):
+    if not request.user.is_staff:
+        messages.error(request, "دسترسی غیرمجاز")
+        return redirect("panel_login")
+
+    property_obj = get_object_or_404(Property, pk=pk)
+    tour_id = (request.POST.get("virtual_tour_id") or "").strip()
+    if tour_id:
+        tour = get_object_or_404(VirtualTour, pk=tour_id)
+        property_obj.virtual_tour = tour
+    else:
+        property_obj.virtual_tour = None
+    property_obj.save(update_fields=["virtual_tour", "updated_at"])
+    messages.success(request, f"بازدید مجازی ملک «{property_obj.title}» به‌روز شد.")
+    return redirect("panel")
+
+
+def virtual_tour_index(request, slug):
+    return virtual_tour_file(request, slug, path="index.html")
+
+
+def virtual_tour_file(request, slug, path):
+    tour = get_object_or_404(VirtualTour, slug=slug)
+    root = tour.absolute_folder
+    if not root.exists():
+        return JsonResponse({"ok": False, "error": "فایل‌های بازدید پیدا نشد"}, status=404)
+    # Prevent empty path
+    safe_path = path or "index.html"
+    return serve(request, safe_path, document_root=str(root))
 
 
 @login_required(login_url="panel_login")

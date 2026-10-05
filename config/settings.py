@@ -129,6 +129,10 @@ SERVE_MEDIA = env_bool("DJANGO_SERVE_MEDIA", True)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Virtual tours (Pano2VR) are multi-file ZIP packages, often 20–100MB.
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("DATA_UPLOAD_MAX_MEMORY_SIZE", str(120 * 1024 * 1024)))
+FILE_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("FILE_UPLOAD_MAX_MEMORY_SIZE", str(20 * 1024 * 1024)))
+
 LOGIN_URL = "panel_login"
 LOGIN_REDIRECT_URL = "panel"
 LOGOUT_REDIRECT_URL = "panel_login"

@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
+from django.utils.text import slugify
 
 
 class AdminJoinRequest(models.Model):
@@ -35,6 +37,39 @@ class AdminJoinRequest(models.Model):
         return f"{self.full_name} ({self.user.username}) - {self.get_status_display()}"
 
 
+class VirtualTour(models.Model):
+    name = models.CharField("نام بازدید مجازی", max_length=200)
+    slug = models.SlugField("شناسه URL", max_length=120, unique=True)
+    storage_dir = models.CharField("پوشه ذخیره‌سازی", max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "بازدید مجازی"
+        verbose_name_plural = "بازدیدهای مجازی"
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse("virtual_tour_index", kwargs={"slug": self.slug})
+
+    @property
+    def absolute_folder(self):
+        return settings.MEDIA_ROOT / "virtual-tours" / self.storage_dir
+
+    @staticmethod
+    def make_unique_slug(name: str) -> str:
+        base = slugify(name) or "tour"
+        base = base[:100]
+        slug = base
+        counter = 2
+        while VirtualTour.objects.filter(slug=slug).exists():
+            slug = f"{base}-{counter}"
+            counter += 1
+        return slug
+
+
 class Property(models.Model):
     source_url = models.URLField(unique=True)
     source_token = models.CharField(max_length=64, unique=True, db_index=True)
@@ -44,6 +79,14 @@ class Property(models.Model):
     property_type = models.CharField(max_length=80, blank=True)
     deal_type = models.CharField(max_length=80, blank=True)
     specs = models.JSONField(default=list, blank=True)
+    virtual_tour = models.ForeignKey(
+        VirtualTour,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="properties",
+        verbose_name="بازدید مجازی",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -59,6 +102,12 @@ class Property(models.Model):
     def cover_image(self):
         image = self.images.order_by("order").first()
         return image.image.url if image else ""
+
+    @property
+    def virtual_tour_url(self):
+        if self.virtual_tour_id:
+            return self.virtual_tour.get_absolute_url()
+        return ""
 
 
 class PropertyImage(models.Model):

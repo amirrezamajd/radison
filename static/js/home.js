@@ -8,6 +8,8 @@
   const priceMeterEl = document.getElementById("modalPriceMeter");
   const chipsEl = document.getElementById("modalChips");
   const specsEl = document.getElementById("modalSpecs");
+  const tourWrap = document.getElementById("modalTourWrap");
+  const tourLink = document.getElementById("modalTourLink");
   const galleryEl = document.getElementById("modalGallery");
   const stageEl = document.getElementById("zoomStage");
   const imageEl = document.getElementById("modalImage");
@@ -110,6 +112,17 @@
       item.textContent = spec;
       specsEl.appendChild(item);
     });
+
+    if (current.virtual_tour_url) {
+      tourWrap.hidden = false;
+      tourLink.href = current.virtual_tour_url;
+      tourLink.textContent = current.virtual_tour_name
+        ? `بازدید مجازی · ${current.virtual_tour_name}`
+        : "مشاهده بازدید مجازی";
+    } else {
+      tourWrap.hidden = true;
+      tourLink.removeAttribute("href");
+    }
 
     thumbsEl.innerHTML = "";
     images.forEach((src, i) => {
