@@ -74,21 +74,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# Prefer persistent /data on PaaS so redeploys do not wipe SQLite/media.
-_persistent_data = Path("/data")
+# On PaaS, the app filesystem is wiped on every redeploy.
+# Production data MUST live on a mounted persistent volume (ParsPack: /data).
+_persistent_data = Path(os.getenv("PERSISTENT_DATA_DIR", "/data"))
+_use_persistent = (not DEBUG) or _persistent_data.is_dir() or bool(os.getenv("SQLITE_PATH"))
 _default_sqlite = (
     _persistent_data / "db.sqlite3"
-    if _persistent_data.is_dir()
+    if _use_persistent
     else BASE_DIR / "db.sqlite3"
 )
 _default_media = (
     _persistent_data / "media"
-    if _persistent_data.is_dir()
+    if _use_persistent
     else BASE_DIR / "media"
 )
 
 sqlite_path = os.getenv("SQLITE_PATH", str(_default_sqlite))
-Path(sqlite_path).parent.mkdir(parents=True, exist_ok=True)
+try:
+    Path(sqlite_path).parent.mkdir(parents=True, exist_ok=True)
+except OSError:
+    # Fall back only for local/dev if /data cannot be created.
+    if not DEBUG:
+        raise
+    sqlite_path = str(BASE_DIR / "db.sqlite3")
+    Path(sqlite_path).parent.mkdir(parents=True, exist_ok=True)
 
 DATABASES = {
     "default": dj_database_url.config(
@@ -124,8 +133,17 @@ STORAGES = {
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", str(_default_media)))
-MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+try:
+    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+except OSError:
+    if not DEBUG:
+        raise
+    MEDIA_ROOT = BASE_DIR / "media"
+    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 SERVE_MEDIA = env_bool("DJANGO_SERVE_MEDIA", True)
+
+# Visible in PaaS logs so you can confirm persistence after deploy.
+print(f"[radison] DEBUG={DEBUG} SQLITE_PATH={sqlite_path} MEDIA_ROOT={MEDIA_ROOT}", flush=True)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

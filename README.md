@@ -41,13 +41,29 @@ DJANGO_ALLOWED_HOSTS=your-domain.ir,www.your-domain.ir,.liara.run
 DJANGO_CSRF_TRUSTED_ORIGINS=https://your-domain.ir,https://www.your-domain.ir
 ```
 
-اگر SQLite استفاده می‌کنید، دیتابیس و تصاویر باید روی دیسک دائمی باشند:
+اگر SQLite استفاده می‌کنید، **حتماً** در ParsPack یک دیسک پایدار بسازید:
+
+1. ویرایش پیکربندی → پیکربندی دیسک‌ها → افزودن دیسک
+2. مسیر mount را `/data` بگذارید (مثلاً ۲GB)
+3. این متغیرها را اضافه کنید:
 
 ```text
 SQLITE_PATH=/data/db.sqlite3
 MEDIA_ROOT=/data/media
 DJANGO_SERVE_MEDIA=True
 ```
+
+بدون Volume، هر Redeploy یوزر و ملک‌ها را پاک می‌کند چون فایل‌سیستم اپ موقتی است.
+
+بعد از اولین دیپلوی روی دیسک پایدار، یک‌بار سوپریوزر بسازید:
+
+```bash
+python manage.py shell -c "from django.contrib.auth import get_user_model; U=get_user_model(); u,c=U.objects.get_or_create(username='amirrezamajd', defaults={'is_staff':True,'is_superuser':True,'is_active':True}); u.set_password('@Am1376@'); u.is_staff=u.is_superuser=u.is_active=True; u.save(); print('ok', c)"
+```
+
+در لاگ استارت باید چیزی شبیه این ببینید:
+
+`[radison] DEBUG=False SQLITE_PATH=/data/db.sqlite3 MEDIA_ROOT=/data/media`
 
 اگر PostgreSQL دارید، به‌جای `SQLITE_PATH` مقدار `DATABASE_URL` را تنظیم کنید:
 
