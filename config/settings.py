@@ -74,7 +74,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-sqlite_path = os.getenv("SQLITE_PATH", str(BASE_DIR / "db.sqlite3"))
+# Prefer persistent /data on PaaS so redeploys do not wipe SQLite/media.
+_persistent_data = Path("/data")
+_default_sqlite = (
+    _persistent_data / "db.sqlite3"
+    if _persistent_data.is_dir()
+    else BASE_DIR / "db.sqlite3"
+)
+_default_media = (
+    _persistent_data / "media"
+    if _persistent_data.is_dir()
+    else BASE_DIR / "media"
+)
+
+sqlite_path = os.getenv("SQLITE_PATH", str(_default_sqlite))
+Path(sqlite_path).parent.mkdir(parents=True, exist_ok=True)
+
 DATABASES = {
     "default": dj_database_url.config(
         default=f"sqlite:///{sqlite_path}",
@@ -108,7 +123,8 @@ STORAGES = {
 }
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", str(BASE_DIR / "media")))
+MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", str(_default_media)))
+MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 SERVE_MEDIA = env_bool("DJANGO_SERVE_MEDIA", True)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
