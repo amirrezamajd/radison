@@ -127,7 +127,8 @@ STORAGES = {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        # Non-manifest storage avoids hard 500s when a hashed file is missing after deploy.
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
@@ -144,6 +145,27 @@ SERVE_MEDIA = env_bool("DJANGO_SERVE_MEDIA", True)
 
 # Visible in PaaS logs so you can confirm persistence after deploy.
 print(f"[radison] DEBUG={DEBUG} SQLITE_PATH={sqlite_path} MEDIA_ROOT={MEDIA_ROOT}", flush=True)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django.request": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+    },
+}
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
