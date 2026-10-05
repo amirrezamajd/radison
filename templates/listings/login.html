@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}ورود ادمین | املاک رادیسون{% endblock %}
 
@@ -6,7 +7,12 @@
 <div class="admin-page">
   <form class="admin-card narrow" method="post">
     {% csrf_token %}
-    <h1>ورود ادمین رادیسون</h1>
+    <div class="admin-brand">
+      <img src="{% static 'img/logo-r.png' %}" alt="Radison" class="admin-brand-logo">
+      <span class="admin-brand-en">Radison</span>
+      <span class="admin-brand-fa">ورود به پنل استخراج</span>
+    </div>
+    <h1>ورود ادمین</h1>
     <p class="sub">برای استخراج ملک از CRM وارد شوید. اگر هنوز حساب ندارید، ثبت‌نام کنید تا پس از تأیید ادمین اصلی فعال شود.</p>
 
     <label class="field">

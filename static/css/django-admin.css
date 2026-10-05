@@ -1,0 +1,279 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Vazirmatn:wght@400;500;600;700&display=swap");
+
+:root {
+  --teal: #0a7f87;
+  --teal-deep: #065f66;
+  --teal-ink: #043b40;
+  --orange: #ff5700;
+  --orange-deep: #e04b00;
+  --foam: #f5fbfb;
+  --mist: #e7f4f5;
+  --ink: #102427;
+  --ink-soft: #3d5558;
+
+  --primary: #0a7f87;
+  --secondary: #043b40;
+  --accent: #ff5700;
+  --primary-fg: #fff;
+  --body-fg: #102427;
+  --body-bg: #eef7f8;
+  --body-quiet-color: #3d5558;
+  --body-loud-color: #043b40;
+  --header-color: #fff;
+  --header-branding-color: #fff;
+  --header-bg: #043b40;
+  --header-link-color: #fff;
+  --breadcrumbs-fg: #d7f0f2;
+  --breadcrumbs-link-fg: #fff;
+  --breadcrumbs-bg: #065f66;
+  --link-fg: #0a7f87;
+  --link-hover-color: #ff5700;
+  --link-selected-fg: #e04b00;
+  --hairline-color: rgba(10, 127, 135, 0.18);
+  --border-color: rgba(10, 127, 135, 0.16);
+  --darkened-bg: #e7f4f5;
+  --selected-bg: #dff3f4;
+  --selected-row: #dff3f4;
+  --button-bg: #0a7f87;
+  --button-hover-bg: #065f66;
+  --default-button-bg: #ff5700;
+  --default-button-hover-bg: #e04b00;
+  --close-button-bg: #3d5558;
+  --close-button-hover-bg: #102427;
+  --delete-button-bg: #c44700;
+  --delete-button-hover-bg: #9f3600;
+  --object-tools-bg: #065f66;
+  --object-tools-hover-bg: #ff5700;
+  --font-family-primary: "Vazirmatn", "Tahoma", sans-serif;
+  --font-family-monospace: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+html[data-theme="dark"],
+:root[data-theme="dark"] {
+  --primary: #1aa0aa;
+  --secondary: #062f33;
+  --accent: #ff6d26;
+  --primary-fg: #fff;
+  --body-fg: #e8f6f7;
+  --body-bg: #0b1c1e;
+  --body-quiet-color: #9bb5b8;
+  --body-loud-color: #ffffff;
+  --header-color: #fff;
+  --header-bg: #062f33;
+  --breadcrumbs-fg: #c7e8ea;
+  --breadcrumbs-bg: #0a4046;
+  --link-fg: #5fd0d8;
+  --link-hover-color: #ff8a4d;
+  --hairline-color: rgba(95, 208, 216, 0.18);
+  --border-color: rgba(95, 208, 216, 0.16);
+  --darkened-bg: #102427;
+  --selected-bg: #143337;
+  --selected-row: #143337;
+  --button-bg: #0a7f87;
+  --button-hover-bg: #1aa0aa;
+  --default-button-bg: #ff5700;
+  --default-button-hover-bg: #ff6d26;
+}
+
+html, body {
+  font-family: var(--font-family-primary) !important;
+  background:
+    radial-gradient(circle at 88% 6%, rgba(255, 87, 0, 0.08), transparent 22%),
+    linear-gradient(180deg, #f7fcfc 0%, #eef7f8 48%, #e6f2f3 100%) !important;
+}
+
+#header {
+  background:
+    linear-gradient(115deg, #043b40 0%, #065f66 48%, #0a7f87 100%) !important;
+  border-bottom: 3px solid var(--orange);
+  box-shadow: 0 10px 28px rgba(4, 59, 64, 0.22);
+}
+
+#branding {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+#branding h1 a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+#branding h1,
+#branding h1 a {
+  font-family: "Barlow Condensed", "Vazirmatn", sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#branding .radison-admin-logo {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.28));
+}
+
+div.breadcrumbs {
+  background: var(--breadcrumbs-bg) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#user-tools a:focus,
+#user-tools a:hover {
+  color: var(--orange) !important;
+  border-bottom-color: var(--orange) !important;
+}
+
+.module,
+.dashboard .module,
+#content-related .module,
+.inline-group,
+fieldset.module {
+  border-radius: 16px !important;
+  border: 1px solid rgba(10, 127, 135, 0.12) !important;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(4, 59, 64, 0.08);
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+.module h2,
+.module caption,
+.inline-group h2,
+fieldset.module h2 {
+  background: linear-gradient(90deg, #065f66, #0a7f87) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.button,
+input[type="submit"],
+input[type="button"],
+.submit-row input,
+a.button {
+  border-radius: 999px !important;
+  font-family: var(--font-family-primary) !important;
+  font-weight: 600 !important;
+}
+
+.button.default,
+input[type="submit"].default,
+.submit-row input.default {
+  background: var(--orange) !important;
+  border-color: var(--orange) !important;
+}
+
+.button.default:hover,
+input[type="submit"].default:hover,
+.submit-row input.default:hover {
+  background: var(--orange-deep) !important;
+}
+
+.object-tools a {
+  border-radius: 999px !important;
+  background: var(--teal) !important;
+}
+
+.object-tools a:hover,
+.object-tools a:focus {
+  background: var(--orange) !important;
+}
+
+#changelist-filter {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(10, 127, 135, 0.12);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+#changelist-filter h2 {
+  background: #065f66 !important;
+}
+
+#changelist table thead th {
+  background: #e7f4f5 !important;
+}
+
+a:link, a:visited {
+  color: var(--link-fg);
+}
+
+a:hover {
+  color: var(--link-hover-color);
+}
+
+.login {
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255, 87, 0, 0.14), transparent 28%),
+    linear-gradient(160deg, #043b40 0%, #065f66 42%, #0a7f87 100%) !important;
+}
+
+.login #header {
+  display: none !important;
+}
+
+.login #container {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 1px solid rgba(10, 127, 135, 0.14) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 24px 60px rgba(4, 59, 64, 0.28) !important;
+  overflow: hidden;
+}
+
+.login #content {
+  padding: 28px 32px 32px !important;
+}
+
+.login .radison-login-brand {
+  display: grid;
+  justify-items: center;
+  gap: 0.55rem;
+  margin: 0 0 1.4rem;
+  text-align: center;
+}
+
+.login .radison-login-brand img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(255, 87, 0, 0.28));
+}
+
+.login .radison-login-brand strong {
+  font-family: "Barlow Condensed", "Vazirmatn", sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 1.55rem;
+  color: var(--teal-ink);
+}
+
+.login .radison-login-brand span {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.login #id_username,
+.login #id_password {
+  border-radius: 12px !important;
+  border-color: rgba(10, 127, 135, 0.2) !important;
+  padding: 10px 12px !important;
+}
+
+.login .submit-row input {
+  width: 100%;
+  margin-top: 0.4rem;
+}
+
+.messagelist li {
+  border-radius: 12px;
+}
+
+#nav-sidebar {
+  border-inline-end: 1px solid rgba(10, 127, 135, 0.12);
+}
+
+#nav-filter {
+  border-radius: 10px;
+}

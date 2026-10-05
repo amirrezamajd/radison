@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:"Radison Admin" }}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="icon" href="{% static 'img/logo-r.png' %}">
+<link rel="stylesheet" href="{% static 'css/django-admin.css' %}">
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+  <a href="{% url 'admin:index' %}">
+    <img class="radison-admin-logo" src="{% static 'img/logo-r.png' %}" alt="Radison">
+    {{ site_header|default:"رادیسون · مدیریت" }}
+  </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

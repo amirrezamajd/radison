@@ -6,7 +6,25 @@
 {% block body %}
 <div class="admin-page">
   <div class="admin-card">
-    <h1>پنل مدیریت رادیسون</h1>
+    <div class="admin-topbar">
+      <div class="admin-brand compact">
+        <img src="{% static 'img/logo-r.png' %}" alt="Radison" class="admin-brand-logo">
+        <div>
+          <span class="admin-brand-en">Radison</span>
+          <span class="admin-brand-fa">پنل استخراج ملک</span>
+        </div>
+      </div>
+      <div class="admin-top-actions">
+        <a class="btn btn-ghost" href="{% url 'home' %}">مشاهده سایت</a>
+        <a class="btn btn-ghost" href="{% url 'admin:index' %}">جنگو ادمین</a>
+        <form action="{% url 'panel_logout' %}" method="post">
+          {% csrf_token %}
+          <button class="btn btn-ghost" type="submit">خروج</button>
+        </form>
+      </div>
+    </div>
+
+    <h1>استخراج از CRM</h1>
     <p class="sub">لینک صفحه عمومی ملک در CRM را وارد کنید تا اطلاعات و تصاویر استخراج و در سایت قرار بگیرد.</p>
 
     {% if messages %}
@@ -33,13 +51,7 @@
 
       <div class="admin-actions">
         <button class="btn btn-primary" id="extractBtn" type="submit">استخراج و بارگذاری</button>
-        <a class="btn btn-ghost" href="{% url 'home' %}">مشاهده سایت</a>
       </div>
-    </form>
-
-    <form action="{% url 'panel_logout' %}" method="post" style="margin-top:0.8rem;">
-      {% csrf_token %}
-      <button class="btn btn-ghost" type="submit">خروج از پنل</button>
     </form>
 
     <div id="extractStatus" class="status">لینک را وارد کنید و استخراج را بزنید.</div>
@@ -52,7 +64,7 @@
               {% if cover %}
                 <img src="{{ cover.image.url }}" alt="{{ property.title }}">
               {% else %}
-                <div style="width:72px;height:72px;border-radius:10px;background:#d7e4dd;"></div>
+                <div class="admin-item-placeholder"></div>
               {% endif %}
             {% endwith %}
             <div>
