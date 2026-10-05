@@ -144,8 +144,9 @@ img { display: block; max-width: 100%; }
 }
 
 .logo-header-text {
-  display: grid;
-  gap: clamp(0.45rem, 1.2vw, 0.75rem);
+  position: relative;
+  display: inline-block;
+  padding-bottom: clamp(1.15rem, 2.4vw, 1.7rem);
   min-width: 0;
 }
 
@@ -159,32 +160,39 @@ img { display: block; max-width: 100%; }
   font-weight: 700;
   color: var(--white);
   text-shadow: 0 16px 42px rgba(0, 0, 0, 0.34);
-  padding-inline-end: 0.06em;
+  /* Cancel trailing letter-spacing so width matches visual RADISON */
+  margin-inline-end: -0.12em;
 }
 
 .logo-header-tag {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% - clamp(1.15rem, 2.4vw, 1.7rem) + 0.35rem);
+  display: flex;
   align-items: center;
-  gap: clamp(0.55rem, 1.5vw, 0.9rem);
+  gap: clamp(0.4rem, 1vw, 0.65rem);
   width: 100%;
+  box-sizing: border-box;
 }
 
 .logo-header-line {
-  height: 2px;
+  flex: 1 1 0;
+  min-width: 0.75rem;
+  height: 1.5px;
   background: rgba(255, 255, 255, 0.82);
 }
 
 .logo-header-label {
+  flex: 0 1 auto;
   font-family: var(--font-display);
-  font-size: clamp(1rem, 2.8vw, 1.55rem);
-  letter-spacing: 0.3em;
+  font-size: clamp(0.72rem, 1.9vw, 1.12rem);
+  letter-spacing: 0.22em;
   line-height: 1;
   text-transform: uppercase;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.94);
   white-space: nowrap;
-  padding-inline-end: 0.18em;
+  margin-inline-end: -0.22em;
 }
 
 .hero h1 {
