@@ -3,18 +3,45 @@
 
 {% block body %}
 <header class="topbar">
-  <strong>RADISON</strong>
+  <a class="brand-lockup" href="#top" aria-label="رادیسون">
+    <img src="{% static 'img/logo-r.png' %}" alt="لوگو رادیسون" class="brand-mark">
+    <span>RADISON</span>
+  </a>
+  <a class="top-link" href="#contact">تماس</a>
 </header>
 
-<section class="hero">
+<section class="hero" id="top">
   <div class="hero-content">
+    <img src="{% static 'img/logo-r.png' %}" alt="" class="hero-logo" aria-hidden="true">
     <span class="brand-en">Radison</span>
-    <span class="brand-fa">املاک رادیسون</span>
-    <h1>سرمایه گذاری املاک منطقه آزاد ساحلی مازندران</h1>
-    <p>انتخابی از فایل‌های منتخب کارگزاری املاک رادیسون؛ با یک کلیک جزئیات و گالری هر ملک را ببینید.</p>
+    <span class="brand-fa">گروه سرمایه‌گذاری و مهندسی املاک</span>
+    <h1>سرمایه‌گذاری املاک منطقه آزاد ساحلی مازندران</h1>
+    <p>مشارکت، خرید و فروش در نوار ساحلی مازندران؛ فایل‌های منتخب را ببینید و مستقیم با تیم رادیسون در ارتباط باشید.</p>
     <div class="cta-row">
       <a class="btn btn-primary" href="#listings">مشاهده ملک‌ها</a>
+      <a class="btn btn-ghost" href="#why">چرا منطقه آزاد؟</a>
     </div>
+  </div>
+</section>
+
+<section class="section why" id="why">
+  <div class="section-head">
+    <h2>چرا منطقه آزاد ساحلی؟</h2>
+    <p>تمرکز رادیسون روی فرصت‌های سرمایه‌گذاری و فایل‌های واقعی نوار ساحلی مازندران است.</p>
+  </div>
+  <div class="why-grid">
+    <article class="why-item">
+      <strong>موقعیت ساحلی</strong>
+      <p>دسترسی به نوار ساحلی و پروژه‌های شاخص منطقه آزاد و اطراف آن.</p>
+    </article>
+    <article class="why-item">
+      <strong>سرمایه‌گذاری هدفمند</strong>
+      <p>انتخاب فایل با نگاه مشارکت، خرید و فروش؛ نه فقط نمایش عمومی.</p>
+    </article>
+    <article class="why-item">
+      <strong>همراهی تخصصی</strong>
+      <p>تیم مهندسی و مشاور املاک رادیسون از انتخاب تا معامله کنار شماست.</p>
+    </article>
   </div>
 </section>
 
@@ -52,8 +79,22 @@
   {% endif %}
 </section>
 
+<section class="contact" id="contact">
+  <div class="contact-inner">
+    <div>
+      <h2>ارتباط با رادیسون</h2>
+      <p>برای بازدید، مشاوره سرمایه‌گذاری یا فایل اختصاصی با ما در تماس باشید.</p>
+    </div>
+    <div class="contact-actions">
+      <a class="btn btn-primary" href="tel:+9811">تماس تلفنی</a>
+      <a class="btn btn-ghost" href="https://wa.me/" target="_blank" rel="noopener">واتساپ</a>
+    </div>
+  </div>
+</section>
+
 <footer class="site-footer">
-  <div class="footer-brand">کارگزاری املاک رادیسون</div>
+  <img src="{% static 'img/logo-r.png' %}" alt="" class="footer-logo" aria-hidden="true">
+  <div class="footer-brand">کارگزاری املاک رادیسون · Real estate Sorkhroud</div>
   <div class="footer-links">
     <a href="{% url 'panel_login' %}">ورود ادمین</a>
     <span aria-hidden="true">·</span>
