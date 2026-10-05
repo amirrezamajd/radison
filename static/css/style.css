@@ -117,28 +117,72 @@ img { display: block; max-width: 100%; }
   animation: riseIn 900ms ease both;
 }
 
+.hero-lockup {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.7rem, 2vw, 1.15rem);
+  margin: 0 auto 1.25rem;
+  direction: ltr;
+  text-align: left;
+}
+
 .hero-logo {
-  width: clamp(84px, 16vw, 120px);
-  height: clamp(84px, 16vw, 120px);
-  margin: 0 auto 1.1rem;
+  width: clamp(72px, 14vw, 108px);
+  height: clamp(72px, 14vw, 108px);
+  flex: 0 0 auto;
   object-fit: contain;
   animation: logoPulse 4.5s ease-in-out infinite;
   will-change: transform, filter;
 }
 
+.hero-lockup-text {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
 .brand-en {
   display: block;
   font-family: var(--font-display);
-  font-size: clamp(3.6rem, 11vw, 6.8rem);
-  letter-spacing: 0.16em;
-  line-height: 0.9;
+  font-size: clamp(2.6rem, 8vw, 4.8rem);
+  letter-spacing: 0.14em;
+  line-height: 0.92;
   text-transform: uppercase;
+  font-weight: 700;
+  color: var(--white);
   text-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+  padding-inline-end: 0.08em;
+}
+
+.brand-tag {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+}
+
+.brand-tag-line {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.brand-tag-label {
+  font-family: var(--font-display);
+  font-size: clamp(0.72rem, 1.8vw, 1rem);
+  letter-spacing: 0.28em;
+  line-height: 1;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  white-space: nowrap;
+  padding-inline-end: 0.18em;
 }
 
 .brand-fa {
   display: block;
-  margin-top: 0.55rem;
+  margin-top: 0.15rem;
   margin-bottom: 1.35rem;
   font-size: clamp(1rem, 2.2vw, 1.25rem);
   letter-spacing: 0.04em;
