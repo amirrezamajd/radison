@@ -57,9 +57,8 @@ img { display: block; max-width: 100%; }
 .brand-mark {
   width: 42px;
   height: 42px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+  object-fit: contain;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.28));
 }
 
 .top-link {
@@ -113,9 +112,8 @@ img { display: block; max-width: 100%; }
   width: clamp(84px, 16vw, 120px);
   height: clamp(84px, 16vw, 120px);
   margin: 0 auto 1.1rem;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  object-fit: contain;
+  filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.35));
   animation: logoPulse 4.5s ease-in-out infinite;
 }
 
@@ -594,14 +592,21 @@ img { display: block; max-width: 100%; }
 .footer-logo {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .footer-brand {
   font-weight: 600;
   color: var(--teal-deep);
 }
+
+.footer-social {
+  color: var(--teal);
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+}
+
+.footer-social:hover { color: var(--orange); }
 
 .footer-links {
   display: flex;
@@ -618,6 +623,26 @@ img { display: block; max-width: 100%; }
 }
 
 .footer-links a:hover { color: var(--orange); }
+
+.footer-credit {
+  margin: 0.85rem 0 0;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  opacity: 0.85;
+}
+
+.footer-credit a {
+  color: var(--teal-deep);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(10, 127, 135, 0.28);
+  padding-bottom: 0.05rem;
+}
+
+.footer-credit a:hover {
+  color: var(--orange);
+  border-bottom-color: rgba(255, 87, 0, 0.45);
+}
 
 .field textarea,
 .field input {
