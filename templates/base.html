@@ -5,7 +5,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}املاک رادیسون | سرخرود مازندران{% endblock %}</title>
-  <meta name="description" content="کارگزاری املاک رادیسون در سرخرود مازندران؛ سرمایه‌گذاری، خرید و فروش ویلا و زمین در نوار ساحلی خزر بین محمودآباد و فریدون‌کنار.">
+  <meta name="description" content="{% block meta_description %}کارگزاری املاک رادیسون در سرخرود مازندران؛ سرمایه‌گذاری، خرید و فروش ویلا و زمین در نوار ساحلی خزر بین محمودآباد و فریدون‌کنار.{% endblock %}">
+  <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
+  <link rel="canonical" href="{% block canonical %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
+  <meta property="og:site_name" content="املاک رادیسون">
+  <meta property="og:locale" content="fa_IR">
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}املاک رادیسون | سرمایه‌گذاری در سرخرود مازندران{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}خرید، فروش و سرمایه‌گذاری ویلا و زمین در سرخرود مازندران با کارگزاری املاک رادیسون.{% endblock %}">
+  <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+  <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/logo-r.png' %}{% endblock %}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#065f66">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -16,10 +27,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=7">
   {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body{% block body_attrs %}{% endblock %}>
   {% block body %}{% endblock %}
   {% block scripts %}{% endblock %}
 </body>

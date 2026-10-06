@@ -1,36 +1,127 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}همه فایل‌های املاک | رادیسون سرخرود{% endblock %}
+{% block title %}خرید و فروش ویلا و زمین در سرخرود | همه فایل‌های املاک رادیسون{% endblock %}
+{% block meta_description %}لیست کامل فایل‌های ویلا، زمین و آپارتمان در سرخرود مازندران؛ جستجو بر اساس نوع معامله، قیمت، متراژ و تعداد خواب در املاک رادیسون.{% endblock %}
+{% block canonical %}{{ request.scheme }}://{{ request.get_host }}{% url 'properties' %}{% endblock %}
+{% block og_title %}همه فایل‌های املاک سرخرود | رادیسون{% endblock %}
+{% block robots %}{% if filters_active %}noindex, follow{% else %}index, follow{% endif %}{% endblock %}
 
 {% block body %}
-<header class="page-topbar">
-  <a class="brand-lockup dark" href="{% url 'home' %}" aria-label="رادیسون">
-    <img src="{% static 'img/logo-r.png' %}" alt="لوگو رادیسون" class="brand-mark">
-    <span class="brand-lockup-text">گروه سرمایه‌گذاری و مهندسی املاک رادیسون</span>
-  </a>
-  <nav class="top-nav dark" aria-label="منوی اصلی">
-    <a class="top-link" href="{% url 'home' %}#about">سرخرود</a>
-    <a class="top-link" href="{% url 'home' %}#why">مزایا</a>
-    <a class="top-link" href="{% url 'properties' %}">همه ملک‌ها</a>
-    <a class="top-link" href="{% url 'home' %}#contact">تماس</a>
-  </nav>
-</header>
+{% include "listings/includes/public_topbar.html" %}
 
 <section class="page-banner">
   <div class="page-banner-inner">
     <p class="page-eyebrow">Radison Real Estate</p>
     <h1>همه فایل‌های موجود در سرخرود</h1>
-    <p>روی هر کارت کلیک کنید تا مشخصات کامل، گالری تصاویر یا بازدید مجازی را ببینید.</p>
+    <p>با فیلترها ملک مناسب خود را پیدا کنید و روی هر کارت بزنید تا مشخصات کامل را ببینید.</p>
   </div>
 </section>
 
 <section class="section properties-page">
+  <form class="property-filters{% if filters_active %} is-open{% endif %}" method="get" action="{% url 'properties' %}" id="propertyFilters">
+    <label class="filter-field filter-search">
+      <span>جستجو</span>
+      <input type="search" name="q" value="{{ filters.q }}" placeholder="عنوان یا کد ملک، مثلاً ویلا دوبلکس یا ۱۲">
+    </label>
+    <button type="button" class="btn btn-ghost filter-toggle" id="filterToggle">فیلتر و مرتب‌سازی</button>
+
+    <label class="filter-field">
+      <span>نوع معامله</span>
+      <select name="deal">
+        <option value="">همه</option>
+        {% for option in deal_options %}
+          <option value="{{ option }}" {% if filters.deal == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label class="filter-field">
+      <span>نوع ملک</span>
+      <select name="type">
+        <option value="">همه</option>
+        {% for option in type_options %}
+          <option value="{{ option }}" {% if filters.type == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label class="filter-field">
+      <span>حداقل قیمت</span>
+      <select name="price_min">
+        <option value="">بدون محدودیت</option>
+        {% for value, label in price_min_options %}
+          <option value="{{ value }}" {% if filters.price_min == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label class="filter-field">
+      <span>حداکثر قیمت</span>
+      <select name="price_max">
+        <option value="">بدون محدودیت</option>
+        {% for value, label in price_max_options %}
+          <option value="{{ value }}" {% if filters.price_max == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label class="filter-field">
+      <span>حداقل متراژ</span>
+      <select name="area_min">
+        <option value="">همه</option>
+        {% for value, label in area_options %}
+          <option value="{{ value }}" {% if filters.area_min == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label class="filter-field">
+      <span>تعداد خواب</span>
+      <select name="beds_min">
+        <option value="">همه</option>
+        {% for value, label in bedroom_options %}
+          <option value="{{ value }}" {% if filters.beds_min == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label class="filter-field">
+      <span>مرتب‌سازی</span>
+      <select name="sort">
+        {% for value, label in sort_options %}
+          <option value="{{ value }}" {% if filters.sort == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <div class="filter-actions">
+      <button class="btn btn-primary" type="submit">جستجو</button>
+      {% if filters_active %}
+        <a class="btn btn-ghost" href="{% url 'properties' %}">حذف فیلترها</a>
+      {% endif %}
+    </div>
+  </form>
+
+  <p class="filter-summary">
+    {% if filters_active %}
+      {{ properties|length }} ملک از {{ total_count }} ملک با فیلترهای شما پیدا شد.
+    {% else %}
+      {{ total_count }} ملک در سایت ثبت شده است.
+    {% endif %}
+  </p>
+
   {% if properties %}
     <div class="property-grid-all">
       {% for listing in properties %}
         {% include "listings/includes/property_card.html" with listing=listing %}
       {% endfor %}
+    </div>
+  {% elif filters_active %}
+    <div class="empty-state">
+      ملکی با این مشخصات پیدا نشد. فیلترها را تغییر دهید یا
+      <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener">در واتساپ</a>
+      بگویید دنبال چه ملکی هستید تا برایتان پیدا کنیم.
     </div>
   {% else %}
     <div class="empty-state">
@@ -39,16 +130,7 @@
   {% endif %}
 </section>
 
-<footer class="site-footer">
-  <img src="{% static 'img/logo-r.png' %}" alt="" class="footer-logo" aria-hidden="true">
-  <div class="footer-brand">کارگزاری املاک رادیسون · سرخرود، مازندران</div>
-  <a class="footer-social" href="https://instagram.com/radison.melk" target="_blank" rel="noopener">instagram.com/radison.melk</a>
-  <p class="footer-credit">
-    Designed by
-    <a href="https://instagram.com/majd.works" target="_blank" rel="noopener">@majd.works</a>
-  </p>
-</footer>
-
+{% include "listings/includes/public_footer.html" %}
 {% include "listings/includes/property_modal.html" %}
 {% endblock %}
 
@@ -56,6 +138,12 @@
 {{ properties_json|json_script:"properties-data" }}
 <script>
   window.RADISON_PROPERTIES = JSON.parse(document.getElementById("properties-data").textContent);
+  document.querySelectorAll("#propertyFilters select").forEach((select) => {
+    select.addEventListener("change", () => select.form.submit());
+  });
+  document.getElementById("filterToggle")?.addEventListener("click", () => {
+    document.getElementById("propertyFilters").classList.toggle("is-open");
+  });
 </script>
-<script src="{% static 'js/home.js' %}?v=4"></script>
+<script src="{% static 'js/home.js' %}?v=5"></script>
 {% endblock %}

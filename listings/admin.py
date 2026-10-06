@@ -19,6 +19,7 @@ class VirtualTourAdmin(admin.ModelAdmin):
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
     list_display = (
+        "id",
         "title",
         "price_text",
         "property_type",
@@ -27,9 +28,10 @@ class PropertyAdmin(admin.ModelAdmin):
         "virtual_tour",
         "updated_at",
     )
-    search_fields = ("title", "source_token", "source_url")
-    list_filter = ("virtual_tour",)
-    readonly_fields = ("view_count", "created_at", "updated_at")
+    list_display_links = ("id", "title")
+    search_fields = ("=id", "title", "source_token", "source_url")
+    list_filter = ("deal_type", "property_type", "virtual_tour")
+    readonly_fields = ("view_count", "price_value", "area_value", "bedrooms", "created_at", "updated_at")
     ordering = ("-view_count", "-updated_at")
     autocomplete_fields = ("virtual_tour",)
     inlines = [PropertyImageInline]

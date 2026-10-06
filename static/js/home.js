@@ -10,6 +10,8 @@
   const specsEl = document.getElementById("modalSpecs");
   const tourWrap = document.getElementById("modalTourWrap");
   const tourLink = document.getElementById("modalTourLink");
+  const whatsappLink = document.getElementById("modalWhatsapp");
+  const pageLink = document.getElementById("modalPageLink");
   const galleryEl = document.getElementById("modalGallery");
   const stageEl = document.getElementById("zoomStage");
   const imageEl = document.getElementById("modalImage");
@@ -106,12 +108,24 @@
     resetZoom(false);
 
     chipsEl.innerHTML = "";
+    if (current.code) {
+      const codeChip = document.createElement("span");
+      codeChip.className = "chip chip-code";
+      codeChip.textContent = `کد ${current.code}`;
+      chipsEl.appendChild(codeChip);
+    }
     [current.property_type, current.deal_type].filter(Boolean).forEach((text) => {
       const chip = document.createElement("span");
       chip.className = "chip";
       chip.textContent = text;
       chipsEl.appendChild(chip);
     });
+
+    if (whatsappLink) whatsappLink.href = current.whatsapp_url || "#";
+    if (pageLink) {
+      pageLink.href = current.url || "#";
+      pageLink.hidden = window.location.pathname === current.url;
+    }
 
     specsEl.innerHTML = "";
     (current.specs || []).forEach((spec) => {
@@ -164,6 +178,13 @@
   function trackView(propertyId) {
     const csrf = getCookie("csrftoken");
     if (!propertyId || !csrf) return;
+    const seenKey = `radison-viewed-${propertyId}`;
+    try {
+      if (sessionStorage.getItem(seenKey)) return;
+      sessionStorage.setItem(seenKey, "1");
+    } catch (_) {
+      /* storage unavailable */
+    }
     fetch(`/api/properties/${propertyId}/view/`, {
       method: "POST",
       headers: {
@@ -174,15 +195,20 @@
     }).catch(() => {});
   }
 
-  function openProperty(id) {
+  function openProperty(id, startIndex = 0) {
     current = properties.find((item) => String(item.id) === String(id));
-    if (!current) return;
-    index = 0;
+    if (!current) return false;
+    const count = (current.images || []).length;
+    index = count ? Math.min(Math.max(startIndex, 0), count - 1) : 0;
     render();
     backdrop.classList.add("open");
     document.body.style.overflow = "hidden";
     trackView(id);
+    return true;
   }
+
+  const pageProperty = document.body.dataset.trackProperty;
+  if (pageProperty) trackView(pageProperty);
 
   function closeModal() {
     backdrop.classList.remove("open");
@@ -191,8 +217,12 @@
     resetZoom(false);
   }
 
-  document.querySelectorAll("[data-property-id]").forEach((button) => {
-    button.addEventListener("click", () => openProperty(button.dataset.propertyId));
+  document.querySelectorAll("[data-property-id]").forEach((trigger) => {
+    trigger.addEventListener("click", (event) => {
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.button === 1) return;
+      const startIndex = Number(trigger.dataset.imageIndex || 0);
+      if (openProperty(trigger.dataset.propertyId, startIndex)) event.preventDefault();
+    });
   });
 
   closeBtn.addEventListener("click", closeModal);

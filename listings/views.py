@@ -1,28 +1,61 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.db.models import F
-from django.http import JsonResponse
+from django.db.models import F, Q
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.views.static import serve
 
 from .models import AdminJoinRequest, Property, VirtualTour
+from .parsing import normalize_digits, normalize_persian
 from .scrape import import_property_from_url
 from .tours import TourUploadError, delete_tour_files, extract_tour_zip
 
 User = get_user_model()
 
 
-def _properties_payload(properties):
+BILLION = 1_000_000_000
+
+PRICE_MIN_OPTIONS = [(1, "۱ میلیارد"), (3, "۳ میلیارد"), (5, "۵ میلیارد"), (10, "۱۰ میلیارد"), (20, "۲۰ میلیارد")]
+PRICE_MAX_OPTIONS = [(3, "۳ میلیارد"), (5, "۵ میلیارد"), (10, "۱۰ میلیارد"), (20, "۲۰ میلیارد"), (50, "۵۰ میلیارد")]
+AREA_OPTIONS = [(100, "۱۰۰ متر"), (150, "۱۵۰ متر"), (200, "۲۰۰ متر"), (300, "۳۰۰ متر"), (500, "۵۰۰ متر")]
+BEDROOM_OPTIONS = [(1, "۱ خواب"), (2, "۲ خواب"), (3, "۳ خواب"), (4, "۴ خواب و بیشتر")]
+SORT_OPTIONS = [
+    ("new", "جدیدترین"),
+    ("price_asc", "ارزان‌ترین"),
+    ("price_desc", "گران‌ترین"),
+    ("area_desc", "بیشترین متراژ"),
+    ("popular", "پربازدیدترین"),
+]
+SORT_ORDERING = {
+    "new": ["-created_at"],
+    "price_asc": [F("price_value").asc(nulls_last=True), "-created_at"],
+    "price_desc": [F("price_value").desc(nulls_last=True), "-created_at"],
+    "area_desc": [F("area_value").desc(nulls_last=True), "-created_at"],
+    "popular": ["-view_count", "-created_at"],
+}
+
+
+def _public_queryset():
+    return Property.objects.prefetch_related("images").select_related("virtual_tour")
+
+
+def _properties_payload(request, properties):
     payload = []
     for item in properties:
+        page_url = request.build_absolute_uri(item.get_absolute_url())
         payload.append(
             {
                 "id": item.id,
+                "code": item.code,
                 "title": item.title,
                 "price_text": item.price_text,
                 "price_per_meter_text": item.price_per_meter_text,
@@ -33,21 +66,83 @@ def _properties_payload(properties):
                 "virtual_tour_url": item.virtual_tour_url,
                 "virtual_tour_name": item.virtual_tour.name if item.virtual_tour_id else "",
                 "view_count": item.view_count,
+                "url": item.get_absolute_url(),
+                "whatsapp_url": item.whatsapp_url(page_url),
             }
         )
     return payload
 
 
+def _distinct_values(field):
+    values = Property.objects.exclude(**{field: ""}).order_by().values_list(field, flat=True)
+    return sorted(set(values))
+
+
+def _int_param(request, name):
+    raw = normalize_digits(request.GET.get(name, "")).strip()
+    return int(raw) if raw.isdigit() else None
+
+
+def _filter_properties(request):
+    filters = {
+        "q": normalize_persian(request.GET.get("q", ""))[:80],
+        "deal": request.GET.get("deal", "").strip(),
+        "type": request.GET.get("type", "").strip(),
+        "price_min": _int_param(request, "price_min"),
+        "price_max": _int_param(request, "price_max"),
+        "area_min": _int_param(request, "area_min"),
+        "beds_min": _int_param(request, "beds_min"),
+        "sort": request.GET.get("sort", "new"),
+    }
+    if filters["sort"] not in SORT_ORDERING:
+        filters["sort"] = "new"
+
+    qs = _public_queryset()
+    q = filters["q"]
+    if q:
+        code = q.lstrip("#").removeprefix("کد").strip()
+        text_match = Q(title__icontains=q) | Q(property_type__icontains=q) | Q(deal_type__icontains=q)
+        qs = qs.filter(text_match | Q(pk=int(code))) if code.isdigit() else qs.filter(text_match)
+    if filters["deal"]:
+        qs = qs.filter(deal_type=filters["deal"])
+    if filters["type"]:
+        qs = qs.filter(property_type=filters["type"])
+    if filters["price_min"]:
+        qs = qs.filter(price_value__gte=filters["price_min"] * BILLION)
+    if filters["price_max"]:
+        qs = qs.filter(price_value__lte=filters["price_max"] * BILLION)
+    if filters["area_min"]:
+        qs = qs.filter(area_value__gte=filters["area_min"])
+    if filters["beds_min"]:
+        qs = qs.filter(bedrooms__gte=filters["beds_min"])
+
+    active = any(filters[key] for key in ("q", "deal", "type", "price_min", "price_max", "area_min", "beds_min"))
+    return qs.order_by(*SORT_ORDERING[filters["sort"]]), filters, active
+
+
+def _filter_options():
+    return {
+        "deal_options": _distinct_values("deal_type"),
+        "type_options": _distinct_values("property_type"),
+        "price_min_options": PRICE_MIN_OPTIONS,
+        "price_max_options": PRICE_MAX_OPTIONS,
+        "area_options": AREA_OPTIONS,
+        "bedroom_options": BEDROOM_OPTIONS,
+        "sort_options": SORT_OPTIONS,
+    }
+
+
 @never_cache
 @ensure_csrf_cookie
 def home(request):
-    properties = Property.objects.prefetch_related("images").select_related("virtual_tour").all()
+    properties = list(_public_queryset().order_by("-created_at"))
     return render(
         request,
         "listings/home.html",
         {
             "properties": properties,
-            "properties_json": _properties_payload(properties),
+            "properties_json": _properties_payload(request, properties),
+            **_filter_options(),
         },
     )
 
@@ -55,15 +150,87 @@ def home(request):
 @never_cache
 @ensure_csrf_cookie
 def properties(request):
-    properties_qs = Property.objects.prefetch_related("images").select_related("virtual_tour").all()
+    properties_qs, filters, filters_active = _filter_properties(request)
+    properties_list = list(properties_qs)
     return render(
         request,
         "listings/properties.html",
         {
-            "properties": properties_qs,
-            "properties_json": _properties_payload(properties_qs),
+            "properties": properties_list,
+            "properties_json": _properties_payload(request, properties_list),
+            "filters": filters,
+            "filters_active": filters_active,
+            "total_count": Property.objects.count(),
+            **_filter_options(),
         },
     )
+
+
+@never_cache
+@ensure_csrf_cookie
+def property_detail(request, pk):
+    listing = get_object_or_404(_public_queryset(), pk=pk)
+    page_url = request.build_absolute_uri(listing.get_absolute_url())
+    images = [request.build_absolute_uri(image.image.url) for image in listing.images.all()]
+
+    similar = _public_queryset().exclude(pk=listing.pk)
+    if listing.property_type:
+        similar = similar.filter(property_type=listing.property_type)
+    similar = list(similar.order_by("-created_at")[:8])
+
+    description_parts = [listing.property_type, listing.deal_type, listing.price_text, *listing.specs[:4]]
+    meta_description = f"{listing.title} در سرخرود · " + " · ".join(part for part in description_parts if part)
+
+    structured_data = {
+        "@context": "https://schema.org",
+        "@type": "RealEstateListing",
+        "name": listing.title,
+        "url": page_url,
+        "description": meta_description,
+        "datePosted": listing.created_at.date().isoformat(),
+        "image": images[:6],
+        "identifier": listing.code,
+        "offers": {
+            "@type": "Offer",
+            "priceCurrency": "IRR",
+            "availability": "https://schema.org/InStock",
+        },
+    }
+    if listing.price_value:
+        structured_data["offers"]["price"] = listing.price_value * 10
+
+    return render(
+        request,
+        "listings/property_detail.html",
+        {
+            "listing": listing,
+            "page_url": page_url,
+            "og_image": images[0] if images else "",
+            "meta_description": meta_description[:300],
+            "whatsapp_url": listing.whatsapp_url(page_url),
+            "similar": similar,
+            "properties_json": _properties_payload(request, [listing, *similar]),
+            "structured_data": _ld_json(structured_data),
+        },
+    )
+
+
+def _ld_json(data):
+    encoded = json.dumps(data, ensure_ascii=False)
+    return mark_safe(encoded.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026"))
+
+
+def robots_txt(request):
+    sitemap_url = request.build_absolute_uri(reverse("sitemap"))
+    lines = [
+        "User-agent: *",
+        "Disallow: /panel/",
+        "Disallow: /django-admin/",
+        "Disallow: /api/",
+        "Allow: /",
+        f"Sitemap: {sitemap_url}",
+    ]
+    return HttpResponse("\n".join(lines) + "\n", content_type="text/plain; charset=utf-8")
 
 
 @never_cache

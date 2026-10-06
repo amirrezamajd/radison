@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ listing.title }} | کد {{ listing.code }} | املاک رادیسون سرخرود{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block canonical %}{{ page_url }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ listing.title }} · {{ listing.price_text|default:"قیمت توافقی" }}{% endblock %}
+{% block og_description %}{{ meta_description }}{% endblock %}
+{% block og_image %}{% if og_image %}{{ og_image }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/logo-r.png' %}{% endif %}{% endblock %}
+{% block extra_head %}
+<script type="application/ld+json">{{ structured_data }}</script>
+{% endblock %}
+{% block body_attrs %} data-track-property="{{ listing.id }}"{% endblock %}
+
+{% block body %}
+{% include "listings/includes/public_topbar.html" %}
+
+<main class="section property-detail">
+  <nav class="breadcrumbs" aria-label="مسیر صفحه">
+    <a href="{% url 'home' %}">خانه</a>
+    <span aria-hidden="true">›</span>
+    <a href="{% url 'properties' %}">همه ملک‌ها</a>
+    <span aria-hidden="true">›</span>
+    <span>کد {{ listing.code }}</span>
+  </nav>
+
+  <div class="detail-layout">
+    <div class="detail-gallery">
+      {% with images=listing.images.all %}
+        {% if images %}
+          <button type="button" class="detail-cover" data-property-id="{{ listing.id }}" data-image-index="0" aria-label="نمایش تصاویر با زوم">
+            <img src="{{ images.0.image.url }}" alt="{{ listing.title }}">
+            <span class="detail-cover-hint">{{ images|length }} تصویر · برای بزرگنمایی بزنید</span>
+          </button>
+          {% if images|length > 1 %}
+            <div class="detail-thumbs">
+              {% for image in images %}
+                <button type="button" data-property-id="{{ listing.id }}" data-image-index="{{ forloop.counter0 }}" aria-label="تصویر {{ forloop.counter }}">
+                  <img src="{{ image.image.url }}" alt="{{ listing.title }} - تصویر {{ forloop.counter }}" loading="lazy">
+                </button>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="detail-cover detail-cover-empty"><span>بدون تصویر</span></div>
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <article class="detail-info">
+      <div class="chip-row">
+        <span class="chip chip-code">کد {{ listing.code }}</span>
+        {% if listing.property_type %}<span class="chip">{{ listing.property_type }}</span>{% endif %}
+        {% if listing.deal_type %}<span class="chip">{{ listing.deal_type }}</span>{% endif %}
+        {% if listing.virtual_tour %}<span class="chip chip-tour">بازدید مجازی</span>{% endif %}
+      </div>
+
+      <h1>{{ listing.title }}</h1>
+
+      <p class="detail-price">
+        {{ listing.price_text|default:"قیمت توافقی" }}
+        {% if listing.price_per_meter_text %}<small>{{ listing.price_per_meter_text }}</small>{% endif %}
+      </p>
+
+      {% if listing.specs %}
+        <ul class="detail-specs">
+          {% for spec in listing.specs %}
+            <li>{{ spec }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <div class="detail-actions">
+        <a class="btn btn-whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener">پیام در واتساپ درباره این ملک</a>
+        <a class="btn btn-ghost" href="tel:{{ SITE_PHONE }}">تماس تلفنی</a>
+        {% if listing.virtual_tour %}
+          <a class="btn btn-primary" href="{{ listing.virtual_tour_url }}" target="_blank" rel="noopener">مشاهده بازدید مجازی</a>
+        {% endif %}
+        <button type="button" class="btn btn-ghost" id="shareProperty" data-url="{{ page_url }}" data-title="{{ listing.title }}">اشتراک‌گذاری</button>
+      </div>
+
+      <p class="detail-note">
+        هنگام تماس، «کد {{ listing.code }}» را بگویید تا مشاور سریع‌تر راهنمایی‌تان کند.
+      </p>
+    </article>
+  </div>
+
+  {% if similar %}
+    <section class="detail-similar">
+      <div class="section-head listings-head">
+        <h2>ملک‌های مشابه</h2>
+        <a class="btn btn-ghost" href="{% url 'properties' %}{% if listing.property_type %}?type={{ listing.property_type|urlencode }}{% endif %}">مشاهده همه</a>
+      </div>
+      <div class="property-grid-all">
+        {% for item in similar %}
+          {% include "listings/includes/property_card.html" with listing=item %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+</main>
+
+{% include "listings/includes/public_footer.html" %}
+{% include "listings/includes/property_modal.html" %}
+{% endblock %}
+
+{% block scripts %}
+{{ properties_json|json_script:"properties-data" }}
+<script>
+  window.RADISON_PROPERTIES = JSON.parse(document.getElementById("properties-data").textContent);
+  (() => {
+    const share = document.getElementById("shareProperty");
+    if (!share) return;
+    share.addEventListener("click", async () => {
+      const url = share.dataset.url;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: share.dataset.title, url });
+        } catch (_) {
+          /* cancelled */
+        }
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(url);
+        share.textContent = "لینک کپی شد";
+      } catch (_) {
+        window.prompt("لینک ملک:", url);
+      }
+    });
+  })();
+</script>
+<script src="{% static 'js/home.js' %}?v=5"></script>
+{% endblock %}

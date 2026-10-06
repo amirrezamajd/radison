@@ -1,10 +1,15 @@
+from django.contrib.sitemaps.views import sitemap
 from django.urls import path, re_path
 
 from . import views
+from .sitemaps import SITEMAPS
 
 urlpatterns = [
     path("", views.home, name="home"),
     path("properties/", views.properties, name="properties"),
+    path("property/<int:pk>/", views.property_detail, name="property_detail"),
+    path("sitemap.xml", sitemap, {"sitemaps": SITEMAPS}, name="sitemap"),
+    path("robots.txt", views.robots_txt, name="robots_txt"),
     path("panel/login/", views.panel_login, name="panel_login"),
     path("panel/register/", views.panel_register, name="panel_register"),
     path("panel/", views.panel, name="panel"),

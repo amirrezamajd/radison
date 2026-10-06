@@ -1,7 +1,11 @@
+from urllib.parse import quote
+
 from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
+
+from .parsing import parse_area, parse_bedrooms, parse_price
 
 
 class AdminJoinRequest(models.Model):
@@ -88,6 +92,9 @@ class Property(models.Model):
         verbose_name="بازدید مجازی",
     )
     view_count = models.PositiveIntegerField("تعداد بازدید", default=0, db_index=True)
+    price_value = models.BigIntegerField("قیمت (تومان)", null=True, blank=True, db_index=True)
+    area_value = models.PositiveIntegerField("متراژ", null=True, blank=True, db_index=True)
+    bedrooms = models.PositiveSmallIntegerField("تعداد خواب", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -98,6 +105,31 @@ class Property(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.refresh_derived_fields()
+        update_fields = kwargs.get("update_fields")
+        if update_fields is not None:
+            kwargs["update_fields"] = set(update_fields) | {"price_value", "area_value", "bedrooms"}
+        super().save(*args, **kwargs)
+
+    def refresh_derived_fields(self):
+        self.price_value = parse_price(self.price_text)
+        self.area_value = parse_area(self.specs)
+        self.bedrooms = parse_bedrooms(self.specs)
+
+    def get_absolute_url(self):
+        return reverse("property_detail", kwargs={"pk": self.pk})
+
+    @property
+    def code(self):
+        return str(self.pk)
+
+    def whatsapp_url(self, page_url: str = "") -> str:
+        text = f"سلام، درباره ملک کد {self.code} «{self.title}» در سایت رادیسون سؤال دارم."
+        if page_url:
+            text += f"\n{page_url}"
+        return f"https://wa.me/{settings.RADISON_WHATSAPP}?text={quote(text)}"
 
     @property
     def cover_image(self):

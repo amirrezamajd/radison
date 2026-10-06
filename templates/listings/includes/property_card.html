@@ -1,4 +1,4 @@
-<button type="button" class="property-card" data-property-id="{{ listing.id }}">
+<a class="property-card" href="{{ listing.get_absolute_url }}" data-property-id="{{ listing.id }}">
   {% with cover=listing.images.first %}
     {% if cover %}
       <img src="{{ cover.image.url }}" alt="{{ listing.title }}" loading="lazy">
@@ -8,6 +8,7 @@
       </div>
     {% endif %}
   {% endwith %}
+  <span class="property-code">کد {{ listing.code }}</span>
   <div class="property-meta">
     {% if listing.deal_type or listing.virtual_tour %}
       <div class="chip-row property-card-chips">
@@ -18,4 +19,4 @@
     <h3>{{ listing.title }}</h3>
     <div class="price">{{ listing.price_text|default:"قیمت توافقی" }}</div>
   </div>
-</button>
+</a>

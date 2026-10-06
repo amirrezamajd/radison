@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sitemaps",
     "listings.apps.ListingsConfig",
 ]
 
@@ -68,6 +69,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "listings.context_processors.site_contact",
             ],
         },
     },
@@ -175,6 +177,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Virtual tours (Pano2VR) are multi-file ZIP packages, often 20–100MB.
 DATA_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("DATA_UPLOAD_MAX_MEMORY_SIZE", str(120 * 1024 * 1024)))
 FILE_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("FILE_UPLOAD_MAX_MEMORY_SIZE", str(20 * 1024 * 1024)))
+
+RADISON_WHATSAPP = os.getenv("RADISON_WHATSAPP", "989022259493")
+RADISON_PHONE = os.getenv("RADISON_PHONE", "+989022259493")
+RADISON_INSTAGRAM = os.getenv("RADISON_INSTAGRAM", "https://instagram.com/radison.melk")
 
 LOGIN_URL = "panel_login"
 LOGIN_REDIRECT_URL = "panel"

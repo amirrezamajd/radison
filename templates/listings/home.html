@@ -1,7 +1,27 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}املاک رادیسون | سرمایه‌گذاری در سرخرود مازندران{% endblock %}
+{% block title %}املاک رادیسون | خرید و فروش ویلا و زمین در سرخرود مازندران{% endblock %}
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  "name": "املاک رادیسون",
+  "url": "{{ request.scheme }}://{{ request.get_host }}/",
+  "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/logo-r.png' %}",
+  "telephone": "{{ SITE_PHONE }}",
+  "areaServed": "سرخرود، محمودآباد، مازندران",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "سرخرود",
+    "addressRegion": "مازندران",
+    "addressCountry": "IR"
+  },
+  "sameAs": ["{{ SITE_INSTAGRAM }}"]
+}
+</script>
+{% endblock %}
 
 {% block body %}
 <header class="topbar">
@@ -50,6 +70,23 @@
       <a class="btn btn-primary listings-all-btn" href="{% url 'properties' %}">مشاهده همه</a>
     {% endif %}
   </div>
+
+  <form class="quick-search" method="get" action="{% url 'properties' %}">
+    <input type="search" name="q" placeholder="جستجوی عنوان یا کد ملک" aria-label="جستجوی ملک">
+    <select name="deal" aria-label="نوع معامله">
+      <option value="">نوع معامله</option>
+      {% for option in deal_options %}<option value="{{ option }}">{{ option }}</option>{% endfor %}
+    </select>
+    <select name="type" aria-label="نوع ملک">
+      <option value="">نوع ملک</option>
+      {% for option in type_options %}<option value="{{ option }}">{{ option }}</option>{% endfor %}
+    </select>
+    <select name="price_max" aria-label="حداکثر قیمت">
+      <option value="">حداکثر قیمت</option>
+      {% for value, label in price_max_options %}<option value="{{ value }}">تا {{ label }}</option>{% endfor %}
+    </select>
+    <button class="btn btn-primary" type="submit">جستجو</button>
+  </form>
 
   {% if properties %}
     <div class="property-rail-shell">
@@ -142,9 +179,9 @@
       <p>برای بازدید حضوری، مشاوره سرمایه‌گذاری یا فایل اختصاصی ویلا و زمین در سرخرود با ما در تماس باشید.</p>
     </div>
     <div class="contact-actions">
-      <a class="btn btn-primary" href="https://wa.me/989022259493" target="_blank" rel="noopener">واتساپ</a>
-      <a class="btn btn-ghost" href="https://instagram.com/radison.melk" target="_blank" rel="noopener">اینستاگرام</a>
-      <a class="btn btn-ghost" href="tel:+989022259493">تماس</a>
+      <a class="btn btn-primary" href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener">واتساپ</a>
+      <a class="btn btn-ghost" href="{{ SITE_INSTAGRAM }}" target="_blank" rel="noopener">اینستاگرام</a>
+      <a class="btn btn-ghost" href="tel:{{ SITE_PHONE }}">تماس</a>
     </div>
   </div>
 </section>
@@ -172,5 +209,5 @@
 <script>
   window.RADISON_PROPERTIES = JSON.parse(document.getElementById("properties-data").textContent);
 </script>
-<script src="{% static 'js/home.js' %}?v=4"></script>
+<script src="{% static 'js/home.js' %}?v=5"></script>
 {% endblock %}

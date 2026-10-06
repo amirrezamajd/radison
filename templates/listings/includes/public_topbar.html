@@ -1,0 +1,13 @@
+{% load static %}
+<header class="page-topbar">
+  <a class="brand-lockup dark" href="{% url 'home' %}" aria-label="رادیسون">
+    <img src="{% static 'img/logo-r.png' %}" alt="لوگو رادیسون" class="brand-mark">
+    <span class="brand-lockup-text">گروه سرمایه‌گذاری و مهندسی املاک رادیسون</span>
+  </a>
+  <nav class="top-nav dark" aria-label="منوی اصلی">
+    <a class="top-link" href="{% url 'home' %}#about">سرخرود</a>
+    <a class="top-link" href="{% url 'home' %}#why">مزایا</a>
+    <a class="top-link" href="{% url 'properties' %}">همه ملک‌ها</a>
+    <a class="top-link" href="{% url 'home' %}#contact">تماس</a>
+  </nav>
+</header>
