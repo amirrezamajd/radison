@@ -50,7 +50,9 @@
   }
 
   document.querySelectorAll("form[data-reextract]").forEach((reextractForm) => {
-    const status = reextractForm.parentElement.querySelector(".reextract-status");
+    const status =
+      reextractForm.querySelector(".reextract-status") ||
+      reextractForm.parentElement.querySelector(".reextract-status");
     const button = reextractForm.querySelector('button[type="submit"]');
     reextractForm.addEventListener("submit", (event) => {
       event.preventDefault();

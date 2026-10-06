@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}ویرایش املاک | پنل رادیسون{% endblock %}
+
+{% block body %}
+<div class="admin-page">
+  <div class="admin-card wide">
+    {% include "listings/includes/panel_topbar.html" with panel_subtitle="ویرایش املاک" %}
+
+    <p class="panel-sync-note">
+      روی هر ملک کلیک کنید تا گزینه‌های ویرایش در پاپ‌آپ باز شود · {{ property_count }} ملک
+    </p>
+
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="status {% if message.tags == 'error' %}error{% else %}ok{% endif %}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <section class="panel-section" id="site-properties">
+      <div class="section-head listings-head">
+        <div>
+          <h1>ملک‌های سایت</h1>
+          <p class="sub">برای استخراج مجدد، بازدید مجازی یا حذف، روی کارت ملک بزنید.</p>
+        </div>
+        <a class="btn btn-primary" href="{% url 'panel' %}#extract">استخراج ملک جدید</a>
+      </div>
+
+      {% if properties %}
+        <div class="panel-property-grid">
+          {% for listing in properties %}
+            <button
+              type="button"
+              class="panel-property-card"
+              data-open-edit="{{ listing.id }}"
+            >
+              {% with cover=listing.images.first %}
+                {% if cover %}
+                  <img src="{{ cover.image.url }}" alt="{{ listing.title }}">
+                {% else %}
+                  <div class="panel-property-empty">بدون تصویر</div>
+                {% endif %}
+              {% endwith %}
+              <div class="panel-property-meta">
+                <h3>{{ listing.title }}</h3>
+                <p>
+                  {{ listing.price_text|default:"—" }}
+                  · {{ listing.images.count }} تصویر
+                  · <span class="view-count">{{ listing.view_count }} بازدید</span>
+                </p>
+              </div>
+            </button>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">هنوز ملکی ذخیره نشده است. از داشبورد یک ملک استخراج کنید.</div>
+      {% endif %}
+    </section>
+  </div>
+</div>
+
+<div class="panel-edit-backdrop" id="panelEditModal" hidden>
+  <div class="panel-edit-modal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+    <div class="panel-edit-top">
+      <div>
+        <h2 id="editModalTitle">ویرایش ملک</h2>
+        <p id="editModalSub" class="panel-edit-sub"></p>
+      </div>
+      <button type="button" class="close-btn" id="editModalClose" aria-label="بستن">✕</button>
+    </div>
+
+    <div class="panel-edit-cover" id="editModalCover"></div>
+
+    <form id="editTourForm" method="post" class="panel-edit-block">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{% url 'panel_properties' %}">
+      <h3>بازدید مجازی</h3>
+      <label class="field">
+        <span>انتخاب تور</span>
+        <select name="virtual_tour_id" id="editTourSelect">
+          <option value="">بدون بازدید مجازی</option>
+          {% for tour in tours %}
+            <option value="{{ tour.id }}">{{ tour.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <button class="btn btn-ghost" type="submit">ذخیره بازدید مجازی</button>
+    </form>
+
+    <form id="editReextractForm" method="post" class="panel-edit-block" data-reextract="1">
+      {% csrf_token %}
+      <h3>استخراج مجدد از CRM</h3>
+      <p class="sub">لینک جدید بدهید تا همین ملک جایگزین و به‌روز شود.</p>
+      <label class="field">
+        <span>لینک ملک CRM</span>
+        <input type="url" name="url" id="editCrmUrl" placeholder="https://crmamlak.app/p/xxxxx" dir="ltr" required>
+      </label>
+      <button class="btn btn-primary" type="submit">استخراج و جایگزینی</button>
+      <div class="reextract-status status" id="editReextractStatus" hidden></div>
+    </form>
+
+    <div class="panel-edit-actions">
+      <a class="btn btn-ghost" id="editDjangoLink" href="#">ویرایش در جنگو</a>
+      <form id="editDeleteForm" method="post" onsubmit="return confirm('این ملک حذف شود؟');">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'panel_properties' %}">
+        <button class="btn btn-danger" type="submit">حذف ملک</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ properties_json|json_script:"panel-properties-data" }}
+<script>
+  window.PANEL_PROPERTIES = JSON.parse(document.getElementById("panel-properties-data").textContent);
+</script>
+<script src="{% static 'js/panel.js' %}?v=4"></script>
+<script src="{% static 'js/panel-properties.js' %}?v=1"></script>
+{% endblock %}

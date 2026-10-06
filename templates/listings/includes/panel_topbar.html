@@ -1,0 +1,20 @@
+{% load static %}
+<div class="admin-topbar">
+  <div class="admin-brand compact">
+    <img src="{% static 'img/logo-r.png' %}" alt="Radison" class="admin-brand-logo">
+    <div>
+      <span class="admin-brand-en">Radison</span>
+      <span class="admin-brand-fa">{{ panel_subtitle|default:"پنل مدیریت" }}</span>
+    </div>
+  </div>
+  <div class="admin-top-actions">
+    <a class="btn btn-ghost" href="{% url 'panel' %}">داشبورد</a>
+    <a class="btn btn-ghost" href="{% url 'panel_properties' %}">ویرایش املاک</a>
+    <a class="btn btn-ghost" href="{% url 'home' %}">مشاهده سایت</a>
+    <a class="btn btn-ghost" href="{% url 'admin:index' %}">جنگو ادمین</a>
+    <form action="{% url 'panel_logout' %}" method="post">
+      {% csrf_token %}
+      <button class="btn btn-ghost" type="submit">خروج</button>
+    </form>
+  </div>
+</div>

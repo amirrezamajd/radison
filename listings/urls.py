@@ -8,6 +8,7 @@ urlpatterns = [
     path("panel/login/", views.panel_login, name="panel_login"),
     path("panel/register/", views.panel_register, name="panel_register"),
     path("panel/", views.panel, name="panel"),
+    path("panel/properties/", views.panel_properties, name="panel_properties"),
     path("panel/extract/", views.panel_extract, name="panel_extract"),
     path("panel/reextract/<int:pk>/", views.panel_reextract, name="panel_reextract"),
     path("panel/tours/upload/", views.panel_tour_upload, name="panel_tour_upload"),

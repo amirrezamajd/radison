@@ -185,6 +185,48 @@ def panel(request):
 
 
 @login_required(login_url="panel_login")
+@never_cache
+def panel_properties(request):
+    if not request.user.is_staff:
+        logout(request)
+        return redirect("panel_login")
+
+    properties = list(
+        Property.objects.prefetch_related("images").select_related("virtual_tour").all()
+    )
+    tours = list(VirtualTour.objects.all())
+    payload = []
+    for item in properties:
+        payload.append(
+            {
+                "id": item.id,
+                "title": item.title,
+                "price_text": item.price_text,
+                "source_url": item.source_url,
+                "images_count": item.images.count(),
+                "view_count": item.view_count,
+                "cover": item.cover_image,
+                "virtual_tour_id": item.virtual_tour_id or "",
+                "assign_url": f"/panel/assign-tour/{item.id}/",
+                "reextract_url": f"/panel/reextract/{item.id}/",
+                "delete_url": f"/panel/delete/{item.id}/",
+                "django_url": f"/django-admin/listings/property/{item.id}/change/",
+            }
+        )
+    return render(
+        request,
+        "listings/panel_properties.html",
+        {
+            "properties": properties,
+            "tours": tours,
+            "property_count": len(properties),
+            "tour_count": len(tours),
+            "properties_json": payload,
+        },
+    )
+
+
+@login_required(login_url="panel_login")
 @require_POST
 def panel_extract(request):
     if not request.user.is_staff:
@@ -313,6 +355,21 @@ def panel_tour_delete(request, pk):
     return redirect("panel")
 
 
+def _staff_required_redirect(request):
+    logout(request)
+    return redirect("panel_login")
+
+
+def _panel_return(request):
+    next_url = (request.POST.get("next") or "").strip()
+    if next_url.startswith("/panel/"):
+        return redirect(next_url)
+    referer = request.META.get("HTTP_REFERER") or ""
+    if "/panel/properties" in referer:
+        return redirect("panel_properties")
+    return redirect("panel")
+
+
 @login_required(login_url="panel_login")
 @require_POST
 def panel_assign_tour(request, pk):
@@ -329,7 +386,7 @@ def panel_assign_tour(request, pk):
         property_obj.virtual_tour = None
     property_obj.save(update_fields=["virtual_tour", "updated_at"])
     messages.success(request, f"بازدید مجازی ملک «{property_obj.title}» به‌روز شد.")
-    return redirect("panel")
+    return _panel_return(request)
 
 
 def virtual_tour_index(request, slug):
@@ -385,7 +442,7 @@ def panel_delete(request, pk):
             image.image.delete(save=False)
     property_obj.delete()
     messages.success(request, f"ملک «{title}» حذف شد.")
-    return redirect("panel")
+    return _panel_return(request)
 
 
 @require_POST
