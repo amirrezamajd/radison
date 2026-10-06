@@ -399,3 +399,40 @@
     }
   });
 })();
+
+(() => {
+  const headers = document.querySelectorAll(".topbar, .page-topbar");
+  if (!headers.length) return;
+
+  function closeNav(header) {
+    header.classList.remove("nav-open");
+    const toggle = header.querySelector("[data-nav-toggle]");
+    if (toggle) toggle.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("nav-locked");
+  }
+
+  headers.forEach((header) => {
+    const toggle = header.querySelector("[data-nav-toggle]");
+    if (!toggle) return;
+    toggle.addEventListener("click", () => {
+      const open = header.classList.toggle("nav-open");
+      toggle.setAttribute("aria-expanded", String(open));
+      document.body.classList.toggle("nav-locked", open);
+    });
+    header.querySelectorAll(".top-nav a").forEach((link) => {
+      link.addEventListener("click", () => closeNav(header));
+    });
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    headers.forEach(closeNav);
+  });
+
+  document.addEventListener("click", (event) => {
+    headers.forEach((header) => {
+      if (!header.classList.contains("nav-open")) return;
+      if (!header.contains(event.target)) closeNav(header);
+    });
+  });
+})();

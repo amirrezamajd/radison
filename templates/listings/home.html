@@ -27,8 +27,14 @@
 <header class="topbar">
   <a class="brand-lockup" href="#top" aria-label="رادیسون">
     <img src="{% static 'img/logo-r.png' %}" alt="لوگو رادیسون" class="brand-mark">
-    <span class="brand-lockup-text">گروه سرمایه‌گذاری و مهندسی املاک رادیسون</span>
+    <span class="brand-lockup-text">
+      <span class="brand-full">گروه سرمایه‌گذاری و مهندسی املاک رادیسون</span>
+      <span class="brand-short">رادیسون</span>
+    </span>
   </a>
+  <button class="nav-toggle" type="button" aria-label="منو" aria-expanded="false" data-nav-toggle>
+    <span></span>
+  </button>
   <nav class="top-nav" aria-label="منوی اصلی">
     <a class="top-link" href="#about">سرخرود</a>
     <a class="top-link" href="#why">مزایا</a>
@@ -209,5 +215,5 @@
 <script>
   window.RADISON_PROPERTIES = JSON.parse(document.getElementById("properties-data").textContent);
 </script>
-<script src="{% static 'js/home.js' %}?v=6"></script>
+<script src="{% static 'js/home.js' %}?v=7"></script>
 {% endblock %}

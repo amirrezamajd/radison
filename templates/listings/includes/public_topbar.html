@@ -2,8 +2,14 @@
 <header class="page-topbar">
   <a class="brand-lockup dark" href="{% url 'home' %}" aria-label="رادیسون">
     <img src="{% static 'img/logo-r.png' %}" alt="لوگو رادیسون" class="brand-mark">
-    <span class="brand-lockup-text">گروه سرمایه‌گذاری و مهندسی املاک رادیسون</span>
+    <span class="brand-lockup-text">
+      <span class="brand-full">گروه سرمایه‌گذاری و مهندسی املاک رادیسون</span>
+      <span class="brand-short">رادیسون</span>
+    </span>
   </a>
+  <button class="nav-toggle dark" type="button" aria-label="منو" aria-expanded="false" data-nav-toggle>
+    <span></span>
+  </button>
   <nav class="top-nav dark" aria-label="منوی اصلی">
     <a class="top-link" href="{% url 'home' %}#about">سرخرود</a>
     <a class="top-link" href="{% url 'home' %}#why">مزایا</a>

@@ -145,8 +145,13 @@ def record_property_event(request, property_obj, kind) -> bool:
 
 
 def prune_analytics() -> None:
+    from django.db.utils import OperationalError
+
     from .models import PageVisit, PropertyEvent
 
     cutoff = timezone.now() - timedelta(days=settings.ANALYTICS_RETENTION_DAYS)
-    PageVisit.objects.filter(created_at__lt=cutoff).delete()
-    PropertyEvent.objects.filter(created_at__lt=cutoff).delete()
+    try:
+        PageVisit.objects.filter(created_at__lt=cutoff).delete()
+        PropertyEvent.objects.filter(created_at__lt=cutoff).delete()
+    except OperationalError:
+        logger.info("Analytics tables not ready; prune skipped")
