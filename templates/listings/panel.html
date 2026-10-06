@@ -11,7 +11,7 @@
         <img src="{% static 'img/logo-r.png' %}" alt="Radison" class="admin-brand-logo">
         <div>
           <span class="admin-brand-en">Radison</span>
-          <span class="admin-brand-fa">پنل استخراج ملک</span>
+          <span class="admin-brand-fa">پنل مدیریت ملک</span>
         </div>
       </div>
       <div class="admin-top-actions">
@@ -27,8 +27,100 @@
     </div>
 
     <p class="panel-sync-note">
-      پنل سایت و جنگو ادمین به یک دیتابیس وصل‌اند · الان {{ property_count }} ملک و {{ tour_count }} بازدید مجازی
+      پنل سایت و جنگو ادمین یک دیتابیس مشترک دارند · الان {{ property_count }} ملک و {{ tour_count }} بازدید مجازی
     </p>
+
+    <section class="panel-section" id="site-properties">
+      <h1>ملک‌های سایت</h1>
+      <p class="sub">همین لیست روی صفحه اصلی هم نمایش داده می‌شود. می‌توانید بازدید مجازی بدهید، در جنگو ویرایش کنید یا حذف کنید.</p>
+
+      {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+            <div class="status {% if message.tags == 'error' %}error{% else %}ok{% endif %}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="admin-list">
+        {% if properties %}
+          {% for listing in properties %}
+            <div class="admin-item property-item">
+              {% with cover=listing.images.first %}
+                {% if cover %}
+                  <img src="{{ cover.image.url }}" alt="{{ listing.title }}">
+                {% else %}
+                  <div class="admin-item-placeholder"></div>
+                {% endif %}
+              {% endwith %}
+              <div class="property-item-body">
+                <h3>{{ listing.title }}</h3>
+                <p>{{ listing.price_text }} · {{ listing.images.count }} تصویر</p>
+                {% if listing.virtual_tour %}
+                  <p class="tour-assigned">
+                    بازدید:
+                    <a href="{{ listing.virtual_tour_url }}" target="_blank" rel="noopener">{{ listing.virtual_tour.name }}</a>
+                  </p>
+                {% endif %}
+                <form class="assign-tour-form" method="post" action="{% url 'panel_assign_tour' listing.id %}">
+                  {% csrf_token %}
+                  <select name="virtual_tour_id" aria-label="انتخاب بازدید مجازی">
+                    <option value="">بدون بازدید مجازی</option>
+                    {% for tour in tours %}
+                      <option value="{{ tour.id }}" {% if listing.virtual_tour_id == tour.id %}selected{% endif %}>{{ tour.name }}</option>
+                    {% endfor %}
+                  </select>
+                  <button class="btn btn-ghost" type="submit">ذخیره بازدید</button>
+                  <a class="btn btn-ghost" href="{% url 'admin:listings_property_change' listing.id %}">ویرایش در جنگو</a>
+                </form>
+              </div>
+              <form method="post" action="{% url 'panel_delete' listing.id %}" onsubmit="return confirm('این ملک حذف شود؟');">
+                {% csrf_token %}
+                <button class="btn btn-danger" type="submit">حذف</button>
+              </form>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">هنوز ملکی ذخیره نشده است. از بخش استخراج یا جنگو ادمین اضافه کنید.</div>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="panel-section">
+      <h1>استخراج از CRM</h1>
+      <p class="sub">لینک صفحه عمومی ملک در CRM را وارد کنید. اگر بازدید مجازی آماده دارید، از لیست انتخاب کنید.</p>
+
+      <form id="extractForm" action="{% url 'panel_extract' %}" method="post">
+        {% csrf_token %}
+        <label class="field">
+          <span>لینک ملک CRM</span>
+          <input
+            type="url"
+            name="url"
+            value="https://crmamlak.app/p/82nmimfhqo"
+            placeholder="https://crmamlak.app/p/xxxxx"
+            dir="ltr"
+            required
+          >
+        </label>
+
+        <label class="field">
+          <span>بازدید مجازی (اختیاری)</span>
+          <select name="virtual_tour_id">
+            <option value="">بدون بازدید مجازی</option>
+            {% for tour in tours %}
+              <option value="{{ tour.id }}">{{ tour.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <div class="admin-actions">
+          <button class="btn btn-primary" id="extractBtn" type="submit">استخراج و بارگذاری</button>
+        </div>
+      </form>
+
+      <div id="extractStatus" class="status">لینک را وارد کنید و استخراج را بزنید.</div>
+    </section>
 
     <section class="panel-section" id="virtual-tours">
       <h1>بازدید مجازی</h1>
@@ -71,100 +163,10 @@
         {% endif %}
       </div>
     </section>
-
-    <section class="panel-section">
-      <h1>استخراج از CRM</h1>
-      <p class="sub">لینک صفحه عمومی ملک در CRM را وارد کنید. اگر بازدید مجازی آماده دارید، از لیست انتخاب کنید.</p>
-
-      {% if messages %}
-        <div class="messages">
-          {% for message in messages %}
-            <div class="status {% if message.tags == 'error' %}error{% else %}ok{% endif %}">{{ message }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
-
-      <form id="extractForm" action="{% url 'panel_extract' %}" method="post">
-        {% csrf_token %}
-        <label class="field">
-          <span>لینک ملک CRM</span>
-          <input
-            type="url"
-            name="url"
-            value="https://crmamlak.app/p/82nmimfhqo"
-            placeholder="https://crmamlak.app/p/xxxxx"
-            dir="ltr"
-            required
-          >
-        </label>
-
-        <label class="field">
-          <span>بازدید مجازی (اختیاری)</span>
-          <select name="virtual_tour_id">
-            <option value="">بدون بازدید مجازی</option>
-            {% for tour in tours %}
-              <option value="{{ tour.id }}">{{ tour.name }}</option>
-            {% endfor %}
-          </select>
-        </label>
-
-        <div class="admin-actions">
-          <button class="btn btn-primary" id="extractBtn" type="submit">استخراج و بارگذاری</button>
-        </div>
-      </form>
-
-      <div id="extractStatus" class="status">لینک را وارد کنید و استخراج را بزنید.</div>
-    </section>
-
-    <section class="panel-section">
-      <h2 class="panel-subtitle">ملک‌های سایت</h2>
-      <div class="admin-list">
-        {% if properties %}
-          {% for property in properties %}
-            <div class="admin-item property-item">
-              {% with cover=property.images.first %}
-                {% if cover %}
-                  <img src="{{ cover.image.url }}" alt="{{ property.title }}">
-                {% else %}
-                  <div class="admin-item-placeholder"></div>
-                {% endif %}
-              {% endwith %}
-              <div class="property-item-body">
-                <h3>{{ property.title }}</h3>
-                <p>{{ property.price_text }} · {{ property.images.count }} تصویر</p>
-                {% if property.virtual_tour %}
-                  <p class="tour-assigned">
-                    بازدید:
-                    <a href="{{ property.virtual_tour_url }}" target="_blank" rel="noopener">{{ property.virtual_tour.name }}</a>
-                  </p>
-                {% endif %}
-                <form class="assign-tour-form" method="post" action="{% url 'panel_assign_tour' property.id %}">
-                  {% csrf_token %}
-                  <select name="virtual_tour_id" aria-label="انتخاب بازدید مجازی">
-                    <option value="">بدون بازدید مجازی</option>
-                    {% for tour in tours %}
-                      <option value="{{ tour.id }}" {% if property.virtual_tour_id == tour.id %}selected{% endif %}>{{ tour.name }}</option>
-                    {% endfor %}
-                  </select>
-                  <button class="btn btn-ghost" type="submit">ذخیره بازدید</button>
-                  <a class="btn btn-ghost" href="{% url 'admin:listings_property_change' property.id %}">ویرایش در جنگو</a>
-                </form>
-              </div>
-              <form method="post" action="{% url 'panel_delete' property.id %}" onsubmit="return confirm('این ملک حذف شود؟');">
-                {% csrf_token %}
-                <button class="btn btn-danger" type="submit">حذف</button>
-              </form>
-            </div>
-          {% endfor %}
-        {% else %}
-          <div class="empty-state">هنوز ملکی ذخیره نشده است.</div>
-        {% endif %}
-      </div>
-    </section>
   </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'js/panel.js' %}"></script>
+<script src="{% static 'js/panel.js' %}?v=2"></script>
 {% endblock %}

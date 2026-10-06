@@ -146,16 +146,18 @@ def panel(request):
         logout(request)
         return redirect("panel_login")
 
-    properties = Property.objects.prefetch_related("images").select_related("virtual_tour").all()
-    tours = VirtualTour.objects.all()
+    properties = list(
+        Property.objects.prefetch_related("images").select_related("virtual_tour").all()
+    )
+    tours = list(VirtualTour.objects.all())
     return render(
         request,
         "listings/panel.html",
         {
             "properties": properties,
             "tours": tours,
-            "property_count": properties.count(),
-            "tour_count": tours.count(),
+            "property_count": len(properties),
+            "tour_count": len(tours),
         },
     )
 
