@@ -195,8 +195,8 @@ img { display: block; max-width: 100%; }
 }
 
 .logo-header-mark {
-  width: clamp(120px, 22vw, 210px);
-  height: clamp(120px, 22vw, 210px);
+  width: clamp(78px, 18vw, 210px);
+  height: clamp(78px, 18vw, 210px);
   flex: 0 0 auto;
   object-fit: contain;
   animation: logoPulse 4.5s ease-in-out infinite;
@@ -213,7 +213,7 @@ img { display: block; max-width: 100%; }
 .logo-header-name {
   display: block;
   font-family: var(--font-display);
-  font-size: clamp(2.4rem, 9vw, 8.4rem);
+  font-size: clamp(2.15rem, 10.5vw, 8.4rem);
   letter-spacing: 0.12em;
   line-height: 0.9;
   text-transform: uppercase;
@@ -222,6 +222,7 @@ img { display: block; max-width: 100%; }
   text-shadow: 0 16px 42px rgba(0, 0, 0, 0.34);
   /* Cancel trailing letter-spacing so width matches visual RADISON */
   margin-inline-end: -0.12em;
+  white-space: nowrap;
 }
 
 .logo-header-tag {
@@ -1541,22 +1542,10 @@ img { display: block; max-width: 100%; }
     background: rgba(10, 127, 135, 0.08);
   }
   .logo-header {
-    flex-direction: column;
-    gap: 0.35rem;
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(0.4rem, 2vw, 1rem);
     margin-bottom: 1.2rem;
-  }
-  .logo-header-mark {
-    width: clamp(72px, 22vw, 110px);
-    height: clamp(72px, 22vw, 110px);
-  }
-  .logo-header-name {
-    font-size: clamp(2.6rem, 15vw, 4.6rem);
-    letter-spacing: 0.08em;
-    margin-inline-end: -0.08em;
-  }
-  .logo-header-label {
-    letter-spacing: 0.16em;
-    margin-inline-end: -0.16em;
   }
   .hero-content { padding-block: 6.2rem 3.2rem; }
   .cta-row .btn { min-width: 9.5rem; }
