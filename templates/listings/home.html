@@ -53,7 +53,7 @@
 
   {% if properties %}
     <div class="property-rail-shell">
-      <button type="button" class="rail-nav rail-nav-prev" id="railPrev" aria-label="قبلی">›</button>
+      <button type="button" class="rail-nav rail-nav-prev" id="railPrev" aria-label="قبلی">‹</button>
       <div class="property-rail-wrap">
         <div class="property-rail" id="propertyRail">
           {% for listing in properties %}
@@ -61,7 +61,7 @@
           {% endfor %}
         </div>
       </div>
-      <button type="button" class="rail-nav rail-nav-next" id="railNext" aria-label="بعدی">‹</button>
+      <button type="button" class="rail-nav rail-nav-next" id="railNext" aria-label="بعدی">›</button>
     </div>
   {% else %}
     <div class="empty-state">
