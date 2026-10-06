@@ -120,7 +120,7 @@
   {% elif filters_active %}
     <div class="empty-state">
       ملکی با این مشخصات پیدا نشد. فیلترها را تغییر دهید یا
-      <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener">در واتساپ</a>
+      <a href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" data-whatsapp="">در واتساپ</a>
       بگویید دنبال چه ملکی هستید تا برایتان پیدا کنیم.
     </div>
   {% else %}
@@ -145,5 +145,5 @@
     document.getElementById("propertyFilters").classList.toggle("is-open");
   });
 </script>
-<script src="{% static 'js/home.js' %}?v=5"></script>
+<script src="{% static 'js/home.js' %}?v=6"></script>
 {% endblock %}

@@ -1,7 +1,7 @@
 <a class="property-card" href="{{ listing.get_absolute_url }}" data-property-id="{{ listing.id }}">
   {% with cover=listing.images.first %}
     {% if cover %}
-      <img src="{{ cover.image.url }}" alt="{{ listing.title }}" loading="lazy">
+      <img src="{{ cover.thumb_url }}" alt="{{ listing.title }}" loading="lazy" decoding="async">
     {% else %}
       <div class="property-card-empty" aria-hidden="true">
         <span>بدون تصویر</span>
@@ -10,8 +10,9 @@
   {% endwith %}
   <span class="property-code">کد {{ listing.code }}</span>
   <div class="property-meta">
-    {% if listing.deal_type or listing.virtual_tour %}
+    {% if listing.deal_type or listing.virtual_tour or listing.is_pinned %}
       <div class="chip-row property-card-chips">
+        {% if listing.is_pinned %}<span class="chip chip-featured">ویژه</span>{% endif %}
         {% if listing.deal_type %}<span class="chip">{{ listing.deal_type }}</span>{% endif %}
         {% if listing.virtual_tour %}<span class="chip chip-tour">بازدید مجازی</span>{% endif %}
       </div>

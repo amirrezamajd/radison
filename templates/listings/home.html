@@ -179,7 +179,7 @@
       <p>برای بازدید حضوری، مشاوره سرمایه‌گذاری یا فایل اختصاصی ویلا و زمین در سرخرود با ما در تماس باشید.</p>
     </div>
     <div class="contact-actions">
-      <a class="btn btn-primary" href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener">واتساپ</a>
+      <a class="btn btn-primary" href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" data-whatsapp="">واتساپ</a>
       <a class="btn btn-ghost" href="{{ SITE_INSTAGRAM }}" target="_blank" rel="noopener">اینستاگرام</a>
       <a class="btn btn-ghost" href="tel:{{ SITE_PHONE }}">تماس</a>
     </div>
@@ -209,5 +209,5 @@
 <script>
   window.RADISON_PROPERTIES = JSON.parse(document.getElementById("properties-data").textContent);
 </script>
-<script src="{% static 'js/home.js' %}?v=5"></script>
+<script src="{% static 'js/home.js' %}?v=6"></script>
 {% endblock %}

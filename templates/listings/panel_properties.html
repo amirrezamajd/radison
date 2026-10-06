@@ -20,6 +20,39 @@
       </div>
     {% endif %}
 
+    <section class="panel-section" id="home-order">
+      <div class="section-head listings-head">
+        <div>
+          <h1>ترتیب ابتدای صفحه اصلی</h1>
+          <p class="sub">این ملک‌ها به همین ترتیب اول صفحه اصلی و در حالت «پیشنهادی» نمایش داده می‌شوند. بقیه بعد از آن‌ها، از جدید به قدیم.</p>
+        </div>
+      </div>
+      {% if pinned %}
+        <ol class="pin-list">
+          {% for item in pinned %}
+            <li class="pin-item">
+              <span class="pin-rank">{{ forloop.counter }}</span>
+              {% with cover=item.images.first %}
+                {% if cover %}<img src="{{ cover.thumb_url }}" alt="">{% else %}<span class="pin-thumb-empty"></span>{% endif %}
+              {% endwith %}
+              <div class="pin-meta">
+                <strong>{{ item.title }}</strong>
+                <span>کد {{ item.code }} · {{ item.price_text|default:"—" }}</span>
+              </div>
+              <form method="post" action="{% url 'panel_pin' item.id %}" class="pin-actions">
+                {% csrf_token %}
+                <button class="pin-btn" type="submit" name="action" value="up" {% if forloop.first %}disabled{% endif %} aria-label="بالاتر">▲</button>
+                <button class="pin-btn" type="submit" name="action" value="down" {% if forloop.last %}disabled{% endif %} aria-label="پایین‌تر">▼</button>
+                <button class="pin-btn pin-remove" type="submit" name="action" value="unpin" aria-label="برداشتن">✕</button>
+              </form>
+            </li>
+          {% endfor %}
+        </ol>
+      {% else %}
+        <div class="empty-state">هنوز ملکی سنجاق نشده. روی یک ملک بزنید و «نمایش در ابتدای صفحه اصلی» را انتخاب کنید.</div>
+      {% endif %}
+    </section>
+
     <section class="panel-section" id="site-properties">
       <div class="section-head listings-head">
         <div>
@@ -39,13 +72,13 @@
             >
               {% with cover=listing.images.first %}
                 {% if cover %}
-                  <img src="{{ cover.image.url }}" alt="{{ listing.title }}">
+                  <img src="{{ cover.thumb_url }}" alt="{{ listing.title }}" loading="lazy">
                 {% else %}
                   <div class="panel-property-empty">بدون تصویر</div>
                 {% endif %}
               {% endwith %}
               <div class="panel-property-meta">
-                <h3>{{ listing.title }}</h3>
+                <h3>{% if listing.is_pinned %}<span class="pin-badge">★ {{ listing.pin_order }}</span> {% endif %}{{ listing.title }}</h3>
                 <p>
                   {{ listing.price_text|default:"—" }}
                   · {{ listing.images.count }} تصویر
@@ -73,6 +106,17 @@
     </div>
 
     <div class="panel-edit-cover" id="editModalCover"></div>
+
+    <form id="editPinForm" method="post" class="panel-edit-block panel-pin-block">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{% url 'panel_properties' %}">
+      <div>
+        <h3>صفحه اصلی</h3>
+        <p class="sub" id="editPinStatus"></p>
+      </div>
+      <button class="btn btn-primary" type="submit" name="action" value="pin" id="editPinBtn">نمایش در ابتدای صفحه اصلی</button>
+      <button class="btn btn-ghost" type="submit" name="action" value="unpin" id="editUnpinBtn">برداشتن از ابتدای صفحه اصلی</button>
+    </form>
 
     <form id="editTourForm" method="post" class="panel-edit-block">
       {% csrf_token %}
@@ -103,6 +147,7 @@
     </form>
 
     <div class="panel-edit-actions">
+      <a class="btn btn-ghost" id="editPageLink" href="#" target="_blank" rel="noopener">صفحه ملک در سایت</a>
       <a class="btn btn-ghost" id="editDjangoLink" href="#">ویرایش در جنگو</a>
       <form id="editDeleteForm" method="post" onsubmit="return confirm('این ملک حذف شود؟');">
         {% csrf_token %}
@@ -120,5 +165,5 @@
   window.PANEL_PROPERTIES = JSON.parse(document.getElementById("panel-properties-data").textContent);
 </script>
 <script src="{% static 'js/panel.js' %}?v=4"></script>
-<script src="{% static 'js/panel-properties.js' %}?v=1"></script>
+<script src="{% static 'js/panel-properties.js' %}?v=2"></script>
 {% endblock %}

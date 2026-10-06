@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}بکاپ دیتابیس | پنل رادیسون{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block body %}
+<div class="admin-page">
+  <div class="admin-card wide">
+    {% include "listings/includes/panel_topbar.html" with panel_subtitle="بکاپ و نسخه پشتیبان" %}
+
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="status {% if message.tags == 'error' %}error{% else %}ok{% endif %}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <section class="panel-section">
+      <h1>وضعیت</h1>
+      <div class="stat-kpis">
+        <div class="stat-kpi"><span>ملک‌های ثبت‌شده</span><strong>{{ property_count }}</strong><small>حجم دیتابیس: {{ db_size }}</small></div>
+        <div class="stat-kpi"><span>فایل‌های رسانه</span><strong>{{ media_count }}</strong><small>{{ media_size }} عکس و تور</small></div>
+        <div class="stat-kpi"><span>بکاپ خودکار</span><strong>هر {{ interval }} ساعت</strong><small>به‌علاوه قبل از هر دیپلوی</small></div>
+        <div class="stat-kpi"><span>نگهداری</span><strong>{{ keep }} نسخه</strong><small>نسخه‌های قدیمی‌تر خودکار پاک می‌شوند</small></div>
+      </div>
+      <p class="panel-sync-note backup-warning">
+        بکاپ‌های خودکار روی همان دیسک سرور (<code dir="ltr">{{ backup_dir }}</code>) ذخیره می‌شوند. برای امنیت کامل،
+        هر چند وقت یک‌بار «بکاپ کامل» را دانلود کنید و جای دیگری (کامپیوتر یا گوگل‌درایو) نگه دارید.
+      </p>
+      <div class="admin-actions">
+        <form method="post" action="{% url 'panel_backup_create' %}">
+          {% csrf_token %}
+          <button class="btn btn-primary" type="submit">ساخت بکاپ همین الان</button>
+        </form>
+        <a class="btn btn-ghost backup-full-btn" href="{% url 'panel_media_download' %}">دانلود بکاپ کامل (دیتابیس + عکس‌ها، ZIP)</a>
+      </div>
+    </section>
+
+    <section class="panel-section">
+      <h1>نسخه‌های بکاپ دیتابیس</h1>
+      {% if backups %}
+        <div class="stat-table-wrap">
+          <table class="stat-table">
+            <thead>
+              <tr><th>تاریخ</th><th>نوع</th><th>حجم</th><th></th></tr>
+            </thead>
+            <tbody>
+              {% for backup in backups %}
+                <tr>
+                  <td>{{ backup.date }}</td>
+                  <td>{{ backup.kind }}</td>
+                  <td dir="ltr">{{ backup.size }}</td>
+                  <td><a href="{% url 'panel_backup_download' backup.name %}">دانلود</a></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">هنوز بکاپی ساخته نشده است. اولین بکاپ خودکار با اولین بازدید سایت ساخته می‌شود.</div>
+      {% endif %}
+    </section>
+
+    <section class="panel-section">
+      <h1>بازگردانی</h1>
+      <p class="sub">
+        اگر اطلاعات پاک شد: فایل بکاپ را با نام <code dir="ltr">db.sqlite3</code> در مسیر دیتابیس
+        (<code dir="ltr">{{ db_path }}</code>) قرار دهید و اپ را Restart کنید. برای عکس‌ها، پوشه <code dir="ltr">media</code>
+        داخل ZIP را در مسیر رسانه کپی کنید.
+      </p>
+    </section>
+  </div>
+</div>
+{% endblock %}

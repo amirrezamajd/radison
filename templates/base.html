@@ -27,8 +27,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=7">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=8">
   {% block extra_head %}{% endblock %}
+  {% if GA_MEASUREMENT_ID and not user.is_staff %}
+    {% block analytics %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ GA_MEASUREMENT_ID }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("js", new Date());
+      gtag("config", "{{ GA_MEASUREMENT_ID|escapejs }}");
+    </script>
+    {% endblock %}
+  {% endif %}
 </head>
 <body{% block body_attrs %}{% endblock %}>
   {% block body %}{% endblock %}

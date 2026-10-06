@@ -10,11 +10,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.views.static import serve
 
-from .models import AdminJoinRequest, Property, VirtualTour
+from .analytics import record_property_event
+from .models import AdminJoinRequest, Property, PropertyEvent, VirtualTour
 from .parsing import normalize_digits, normalize_persian
 from .scrape import import_property_from_url
 from .tours import TourUploadError, delete_tour_files, extract_tour_zip
@@ -28,7 +29,10 @@ PRICE_MIN_OPTIONS = [(1, "۱ میلیارد"), (3, "۳ میلیارد"), (5, "۵
 PRICE_MAX_OPTIONS = [(3, "۳ میلیارد"), (5, "۵ میلیارد"), (10, "۱۰ میلیارد"), (20, "۲۰ میلیارد"), (50, "۵۰ میلیارد")]
 AREA_OPTIONS = [(100, "۱۰۰ متر"), (150, "۱۵۰ متر"), (200, "۲۰۰ متر"), (300, "۳۰۰ متر"), (500, "۵۰۰ متر")]
 BEDROOM_OPTIONS = [(1, "۱ خواب"), (2, "۲ خواب"), (3, "۳ خواب"), (4, "۴ خواب و بیشتر")]
+PINNED_FIRST = [F("pin_order").asc(nulls_last=True), "-created_at"]
+
 SORT_OPTIONS = [
+    ("featured", "پیشنهادی"),
     ("new", "جدیدترین"),
     ("price_asc", "ارزان‌ترین"),
     ("price_desc", "گران‌ترین"),
@@ -36,6 +40,7 @@ SORT_OPTIONS = [
     ("popular", "پربازدیدترین"),
 ]
 SORT_ORDERING = {
+    "featured": PINNED_FIRST,
     "new": ["-created_at"],
     "price_asc": [F("price_value").asc(nulls_last=True), "-created_at"],
     "price_desc": [F("price_value").desc(nulls_last=True), "-created_at"],
@@ -92,10 +97,10 @@ def _filter_properties(request):
         "price_max": _int_param(request, "price_max"),
         "area_min": _int_param(request, "area_min"),
         "beds_min": _int_param(request, "beds_min"),
-        "sort": request.GET.get("sort", "new"),
+        "sort": request.GET.get("sort", "featured"),
     }
     if filters["sort"] not in SORT_ORDERING:
-        filters["sort"] = "new"
+        filters["sort"] = "featured"
 
     qs = _public_queryset()
     q = filters["q"]
@@ -135,7 +140,7 @@ def _filter_options():
 @never_cache
 @ensure_csrf_cookie
 def home(request):
-    properties = list(_public_queryset().order_by("-created_at"))
+    properties = list(_public_queryset().order_by(*PINNED_FIRST))
     return render(
         request,
         "listings/home.html",
@@ -374,6 +379,9 @@ def panel_properties(request):
                 "view_count": item.view_count,
                 "cover": item.cover_image,
                 "virtual_tour_id": item.virtual_tour_id or "",
+                "pinned": item.is_pinned,
+                "pin_url": reverse("panel_pin", args=[item.id]),
+                "page_url": item.get_absolute_url(),
                 "assign_url": f"/panel/assign-tour/{item.id}/",
                 "reextract_url": f"/panel/reextract/{item.id}/",
                 "delete_url": f"/panel/delete/{item.id}/",
@@ -385,6 +393,7 @@ def panel_properties(request):
         "listings/panel_properties.html",
         {
             "properties": properties,
+            "pinned": sorted((p for p in properties if p.is_pinned), key=lambda p: (p.pin_order, p.id)),
             "tours": tours,
             "property_count": len(properties),
             "tour_count": len(tours),
@@ -574,6 +583,9 @@ def track_property_view(request, pk):
             }
         )
 
+    if not record_property_event(request, property_obj, PropertyEvent.Kind.VIEW):
+        return JsonResponse({"ok": True, "counted": False, "view_count": property_obj.view_count})
+
     Property.objects.filter(pk=pk).update(view_count=F("view_count") + 1)
     property_obj.refresh_from_db(fields=["view_count"])
     return JsonResponse(
@@ -583,6 +595,19 @@ def track_property_view(request, pk):
             "view_count": property_obj.view_count,
         }
     )
+
+
+@csrf_exempt
+@require_POST
+def track_whatsapp_click(request, pk=None):
+    property_obj = get_object_or_404(Property, pk=pk) if pk else None
+    counted = record_property_event(request, property_obj, PropertyEvent.Kind.WHATSAPP)
+    return JsonResponse({"ok": True, "counted": counted})
+
+
+def page_not_found(request, exception=None):
+    suggestions = list(_public_queryset().order_by(*PINNED_FIRST)[:4])
+    return render(request, "404.html", {"suggestions": suggestions}, status=404)
 
 
 def virtual_tour_file(request, slug, path):
@@ -605,8 +630,7 @@ def panel_delete(request, pk):
     property_obj = get_object_or_404(Property, pk=pk)
     title = property_obj.title
     for image in property_obj.images.all():
-        if image.image:
-            image.image.delete(save=False)
+        image.delete_files()
     property_obj.delete()
     messages.success(request, f"ملک «{title}» حذف شد.")
     return _panel_return(request)

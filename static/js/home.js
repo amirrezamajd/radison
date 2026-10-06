@@ -121,7 +121,10 @@
       chipsEl.appendChild(chip);
     });
 
-    if (whatsappLink) whatsappLink.href = current.whatsapp_url || "#";
+    if (whatsappLink) {
+      whatsappLink.href = current.whatsapp_url || "#";
+      whatsappLink.dataset.whatsapp = current.id;
+    }
     if (pageLink) {
       pageLink.href = current.url || "#";
       pageLink.hidden = window.location.pathname === current.url;
@@ -377,5 +380,22 @@
   });
   next.addEventListener("click", () => {
     rail.scrollBy({ left: -step(), behavior: "smooth" });
+  });
+})();
+
+(() => {
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("a[data-whatsapp]");
+    if (!link) return;
+    const id = link.dataset.whatsapp;
+    const url = id ? `/api/properties/${id}/whatsapp/` : "/api/whatsapp/";
+    if (typeof window.gtag === "function") {
+      window.gtag("event", "whatsapp_click", { property_id: id || "general" });
+    }
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url);
+    } else {
+      fetch(url, { method: "POST", keepalive: true, credentials: "same-origin" }).catch(() => {});
+    }
   });
 })();

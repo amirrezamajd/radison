@@ -7,6 +7,7 @@ from .models import AdminJoinRequest, Property, PropertyImage, VirtualTour
 class PropertyImageInline(admin.TabularInline):
     model = PropertyImage
     extra = 0
+    readonly_fields = ("thumbnail",)
 
 
 @admin.register(VirtualTour)
@@ -25,10 +26,12 @@ class PropertyAdmin(admin.ModelAdmin):
         "property_type",
         "deal_type",
         "view_count",
+        "pin_order",
         "virtual_tour",
         "updated_at",
     )
     list_display_links = ("id", "title")
+    list_editable = ("pin_order",)
     search_fields = ("=id", "title", "source_token", "source_url")
     list_filter = ("deal_type", "property_type", "virtual_tour")
     readonly_fields = ("view_count", "price_value", "area_value", "bedrooms", "created_at", "updated_at")
@@ -48,8 +51,7 @@ class PropertyAdmin(admin.ModelAdmin):
     @staticmethod
     def _delete_image_files(property_obj):
         for image in property_obj.images.all():
-            if image.image:
-                image.image.delete(save=False)
+            image.delete_files()
 
 
 @admin.register(AdminJoinRequest)

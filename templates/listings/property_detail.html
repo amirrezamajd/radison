@@ -37,7 +37,7 @@
             <div class="detail-thumbs">
               {% for image in images %}
                 <button type="button" data-property-id="{{ listing.id }}" data-image-index="{{ forloop.counter0 }}" aria-label="تصویر {{ forloop.counter }}">
-                  <img src="{{ image.image.url }}" alt="{{ listing.title }} - تصویر {{ forloop.counter }}" loading="lazy">
+                  <img src="{{ image.thumb_url }}" alt="{{ listing.title }} - تصویر {{ forloop.counter }}" loading="lazy" decoding="async">
                 </button>
               {% endfor %}
             </div>
@@ -72,7 +72,7 @@
       {% endif %}
 
       <div class="detail-actions">
-        <a class="btn btn-whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener">پیام در واتساپ درباره این ملک</a>
+        <a class="btn btn-whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener" data-whatsapp="{{ listing.id }}">پیام در واتساپ درباره این ملک</a>
         <a class="btn btn-ghost" href="tel:{{ SITE_PHONE }}">تماس تلفنی</a>
         {% if listing.virtual_tour %}
           <a class="btn btn-primary" href="{{ listing.virtual_tour_url }}" target="_blank" rel="noopener">مشاهده بازدید مجازی</a>
@@ -131,5 +131,5 @@
     });
   })();
 </script>
-<script src="{% static 'js/home.js' %}?v=5"></script>
+<script src="{% static 'js/home.js' %}?v=6"></script>
 {% endblock %}

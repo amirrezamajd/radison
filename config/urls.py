@@ -4,6 +4,8 @@ from django.urls import include, path, re_path
 from django.views.generic import RedirectView
 from django.views.static import serve
 
+handler404 = "listings.views.page_not_found"
+
 urlpatterns = [
     path("django-admin/", admin.site.urls),
     path(

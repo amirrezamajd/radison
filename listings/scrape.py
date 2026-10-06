@@ -73,8 +73,7 @@ def download_image(remote_url: str) -> ContentFile:
 
 def _clear_property_images(property_obj: Property) -> None:
     for image in property_obj.images.all():
-        if image.image:
-            image.image.delete(save=False)
+        image.delete_files()
     property_obj.images.all().delete()
 
 

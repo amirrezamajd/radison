@@ -13,6 +13,11 @@
   const crmUrl = document.getElementById("editCrmUrl");
   const djangoLink = document.getElementById("editDjangoLink");
   const deleteForm = document.getElementById("editDeleteForm");
+  const pinForm = document.getElementById("editPinForm");
+  const pinStatus = document.getElementById("editPinStatus");
+  const pinBtn = document.getElementById("editPinBtn");
+  const unpinBtn = document.getElementById("editUnpinBtn");
+  const pageLink = document.getElementById("editPageLink");
   let current = null;
 
   function openEdit(id) {
@@ -34,6 +39,14 @@
     crmUrl.value = current.source_url || "";
     djangoLink.href = current.django_url;
     deleteForm.action = current.delete_url;
+    pageLink.href = current.page_url;
+
+    pinForm.action = current.pin_url;
+    pinBtn.hidden = current.pinned;
+    unpinBtn.hidden = !current.pinned;
+    pinStatus.textContent = current.pinned
+      ? "این ملک الان جزو ملک‌های ابتدای صفحه اصلی است."
+      : "این ملک به ترتیب عادی (جدید به قدیم) نمایش داده می‌شود.";
 
     backdrop.hidden = false;
     document.body.style.overflow = "hidden";

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}آمار سایت | پنل رادیسون{% endblock %}
+{% block robots %}noindex, nofollow{% endblock %}
+
+{% block body %}
+<div class="admin-page">
+  <div class="admin-card wide">
+    {% include "listings/includes/panel_topbar.html" with panel_subtitle="آمار سایت" %}
+
+    <p class="panel-sync-note">
+      امروز {{ today_label }} · بازدیدهای ادمین‌ها و ربات‌ها شمرده نمی‌شوند.
+      {% if ga_enabled %}گوگل آنالیتیکس هم فعال است.{% endif %}
+    </p>
+
+    <section class="panel-section">
+      <div class="stat-kpis">
+        {% for kpi in kpis %}
+          <div class="stat-kpi">
+            <span>{{ kpi.label }}</span>
+            <strong>{{ kpi.value }}</strong>
+            <small>{{ kpi.hint }}</small>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="panel-section">
+      <h1>۱۴ روز اخیر</h1>
+      <div class="stat-legend">
+        <span><i class="dot dot-visits"></i>بازدید صفحه</span>
+        <span><i class="dot dot-views"></i>باز شدن ملک</span>
+        <span><i class="dot dot-whatsapp"></i>کلیک واتساپ</span>
+      </div>
+      <div class="stat-chart">
+        {% for day in days %}
+          <div class="stat-day" title="{{ day.full_label }} · {{ day.visits }} بازدید ({{ day.visitors }} نفر) · {{ day.views }} باز شدن ملک · {{ day.whatsapp }} واتساپ">
+            <div class="stat-bars">
+              <span class="bar bar-visits" style="height: {{ day.visits_h }}%"></span>
+              <span class="bar bar-views" style="height: {{ day.views_h }}%"></span>
+              <span class="bar bar-whatsapp" style="height: {{ day.whatsapp_h }}%"></span>
+            </div>
+            <span class="stat-day-label">{{ day.label }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="panel-section">
+      <h1>پربازدیدترین ملک‌ها</h1>
+      <p class="sub">مرتب‌شده بر اساس بازدید ۷ روز اخیر. کلیک‌های واتساپ عمومی (بدون ملک خاص) در ۷ روز: {{ general_whatsapp }}</p>
+      {% if top_properties %}
+        <div class="stat-table-wrap">
+          <table class="stat-table">
+            <thead>
+              <tr>
+                <th>ملک</th>
+                <th>بازدید ۷ روز</th>
+                <th>واتساپ ۷ روز</th>
+                <th>کل بازدید</th>
+                <th>کل واتساپ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in top_properties %}
+                <tr>
+                  <td><a href="{{ item.get_absolute_url }}" target="_blank" rel="noopener">کد {{ item.code }} · {{ item.title }}</a></td>
+                  <td>{{ item.views_7 }}</td>
+                  <td>{{ item.whatsapp_7 }}</td>
+                  <td>{{ item.view_count }}</td>
+                  <td>{{ item.whatsapp_all }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">هنوز ملکی ثبت نشده است.</div>
+      {% endif %}
+    </section>
+
+    <div class="stat-columns">
+      <section class="panel-section">
+        <h1>بازدیدکننده‌ها از کجا می‌آیند؟</h1>
+        <p class="sub">۳۰ روز اخیر · {{ entry_total }} ورود به سایت</p>
+        {% if sources %}
+          <ul class="stat-shares">
+            {% for row in sources %}
+              <li>
+                <div><span>{{ row.source }}</span><strong>{{ row.count }}</strong></div>
+                <span class="share-bar"><span style="width: {{ row.percent }}%"></span></span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="empty-state">هنوز داده‌ای ثبت نشده است.</div>
+        {% endif %}
+        <p class="stat-tip">
+          برای تفکیک دقیق‌تر، در لینک بیو اینستاگرام از <code dir="ltr">?utm_source=instagram</code> استفاده کنید.
+        </p>
+      </section>
+
+      <section class="panel-section">
+        <h1>دستگاه‌ها</h1>
+        <p class="sub">۳۰ روز اخیر · بر اساس بازدیدکننده یکتا</p>
+        {% if devices %}
+          <ul class="stat-shares">
+            {% for row in devices %}
+              <li>
+                <div><span>{{ row.label }}</span><strong>{{ row.percent }}٪</strong></div>
+                <span class="share-bar"><span style="width: {{ row.percent }}%"></span></span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="empty-state">هنوز داده‌ای ثبت نشده است.</div>
+        {% endif %}
+
+        <h1 class="stat-subhead">صفحه‌های پربازدید</h1>
+        {% if top_pages %}
+          <ul class="stat-pages">
+            {% for row in top_pages %}
+              <li><a href="{{ row.path }}" target="_blank" rel="noopener" dir="ltr">{{ row.path }}</a><strong>{{ row.count }}</strong></li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="empty-state">هنوز داده‌ای ثبت نشده است.</div>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %}

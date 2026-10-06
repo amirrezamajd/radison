@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}صفحه پیدا نشد | املاک رادیسون{% endblock %}
+{% block robots %}noindex, follow{% endblock %}
+
+{% block body %}
+{% include "listings/includes/public_topbar.html" %}
+
+<main class="section not-found">
+  <div class="not-found-card">
+    <img src="{% static 'img/logo-r.png' %}" alt="" class="not-found-logo" aria-hidden="true">
+    <p class="not-found-code">۴۰۴</p>
+    <h1>این صفحه پیدا نشد</h1>
+    <p>ممکن است این ملک فروخته یا حذف شده باشد، یا آدرس اشتباه وارد شده باشد.</p>
+    <form class="quick-search not-found-search" method="get" action="{% url 'properties' %}">
+      <input type="search" name="q" placeholder="جستجوی عنوان یا کد ملک" aria-label="جستجوی ملک">
+      <button class="btn btn-primary" type="submit">جستجو</button>
+    </form>
+    <div class="cta-row not-found-actions">
+      <a class="btn btn-primary" href="{% url 'home' %}">صفحه اصلی</a>
+      <a class="btn btn-ghost" href="{% url 'properties' %}">همه ملک‌ها</a>
+      <a class="btn btn-whatsapp" href="https://wa.me/{{ WHATSAPP_NUMBER }}" target="_blank" rel="noopener" data-whatsapp="">پرسیدن در واتساپ</a>
+    </div>
+  </div>
+
+  {% if suggestions %}
+    <section class="detail-similar">
+      <div class="section-head listings-head">
+        <h2>شاید این ملک‌ها را بپسندید</h2>
+      </div>
+      <div class="property-grid-all">
+        {% for listing in suggestions %}
+          {% include "listings/includes/property_card.html" with listing=listing %}
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+</main>
+
+{% include "listings/includes/public_footer.html" %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/home.js' %}?v=6"></script>
+{% endblock %}

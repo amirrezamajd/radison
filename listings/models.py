@@ -1,3 +1,4 @@
+import builtins
 from urllib.parse import quote
 
 from django.conf import settings
@@ -5,6 +6,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 
+from .images import optimize_upload
 from .parsing import parse_area, parse_bedrooms, parse_price
 
 
@@ -95,6 +97,13 @@ class Property(models.Model):
     price_value = models.BigIntegerField("قیمت (تومان)", null=True, blank=True, db_index=True)
     area_value = models.PositiveIntegerField("متراژ", null=True, blank=True, db_index=True)
     bedrooms = models.PositiveSmallIntegerField("تعداد خواب", null=True, blank=True)
+    pin_order = models.PositiveIntegerField(
+        "ترتیب در ابتدای صفحه اصلی",
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="خالی = عادی. ملک‌های دارای عدد، به ترتیب اول صفحه اصلی نمایش داده می‌شوند.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -143,9 +152,20 @@ class Property(models.Model):
         return ""
 
 
+    @property
+    def is_pinned(self):
+        return self.pin_order is not None
+
+    @property
+    def cover_thumbnail(self):
+        image = self.images.order_by("order").first()
+        return image.thumb_url if image else ""
+
+
 class PropertyImage(models.Model):
     property = models.ForeignKey(Property, related_name="images", on_delete=models.CASCADE)
     image = models.ImageField(upload_to="properties/%Y/%m/")
+    thumbnail = models.ImageField(upload_to="properties/thumbs/%Y/%m/", blank=True)
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -153,3 +173,56 @@ class PropertyImage(models.Model):
 
     def __str__(self):
         return f"{self.property.title} - تصویر {self.order + 1}"
+
+    @builtins.property
+    def thumb_url(self):
+        if self.thumbnail:
+            return self.thumbnail.url
+        return self.image.url if self.image else ""
+
+    def save(self, *args, **kwargs):
+        if self.image and not self.image._committed:
+            optimized = optimize_upload(self.image)
+            if optimized:
+                self.image, self.thumbnail = optimized
+        super().save(*args, **kwargs)
+
+    def delete_files(self):
+        for field in (self.image, self.thumbnail):
+            if field:
+                field.delete(save=False)
+
+
+class PropertyEvent(models.Model):
+    class Kind(models.TextChoices):
+        VIEW = "view", "بازدید ملک"
+        WHATSAPP = "whatsapp", "کلیک واتساپ"
+
+    property = models.ForeignKey(
+        Property,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="events",
+    )
+    kind = models.CharField(max_length=20, choices=Kind.choices, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "رویداد ملک"
+        verbose_name_plural = "رویدادهای ملک"
+
+
+class PageVisit(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    path = models.CharField(max_length=255)
+    source = models.CharField("منبع", max_length=120, db_index=True)
+    referrer_host = models.CharField(max_length=255, blank=True)
+    device = models.CharField(max_length=20, blank=True)
+    visitor_id = models.CharField(max_length=32, db_index=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "بازدید صفحه"
+        verbose_name_plural = "بازدیدهای صفحه"

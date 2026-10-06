@@ -55,6 +55,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "config.middleware.NoStoreDynamicMiddleware",
+    "listings.middleware.SiteAnalyticsMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -147,6 +148,13 @@ except OSError:
     MEDIA_ROOT = BASE_DIR / "media"
     MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 SERVE_MEDIA = env_bool("DJANGO_SERVE_MEDIA", True)
+
+BACKUP_DIR = Path(os.getenv("BACKUP_DIR", str(Path(sqlite_path).parent / "backups")))
+BACKUP_KEEP = int(os.getenv("BACKUP_KEEP", "20"))
+BACKUP_INTERVAL_HOURS = float(os.getenv("BACKUP_INTERVAL_HOURS", "24"))
+
+GA_MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID", "").strip()
+ANALYTICS_RETENTION_DAYS = int(os.getenv("ANALYTICS_RETENTION_DAYS", "365"))
 
 # Visible in PaaS logs so you can confirm persistence after deploy.
 print(f"[radison] DEBUG={DEBUG} SQLITE_PATH={sqlite_path} MEDIA_ROOT={MEDIA_ROOT}", flush=True)
