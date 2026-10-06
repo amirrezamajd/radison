@@ -88,9 +88,17 @@
   function render() {
     if (!current) return;
     const images = current.images || [];
-    imageEl.src = images[index] || "";
-    imageEl.alt = `${current.title} - تصویر ${index + 1}`;
-    countEl.textContent = `${index + 1} / ${images.length || 0}`;
+    const hasImages = images.length > 0;
+    if (hasImages) {
+      imageEl.src = images[index] || "";
+      imageEl.alt = `${current.title} - تصویر ${index + 1}`;
+      imageEl.hidden = false;
+    } else {
+      imageEl.removeAttribute("src");
+      imageEl.alt = "بدون تصویر";
+      imageEl.hidden = true;
+    }
+    countEl.textContent = hasImages ? `${index + 1} / ${images.length}` : "بدون تصویر";
     titleEl.textContent = current.title;
     priceEl.textContent = current.price_text || "";
     priceMeterEl.textContent = current.price_per_meter_text || "";
@@ -112,6 +120,12 @@
       item.textContent = spec;
       specsEl.appendChild(item);
     });
+    if (!hasImages) {
+      const empty = document.createElement("span");
+      empty.className = "spec";
+      empty.textContent = "هنوز تصویری برای این ملک ثبت نشده است.";
+      specsEl.appendChild(empty);
+    }
 
     if (current.virtual_tour_url) {
       tourWrap.hidden = false;
@@ -311,5 +325,27 @@
     if (scale > 1.01) return;
     if (event.key === "ArrowLeft") prevBtn.click();
     if (event.key === "ArrowRight") nextBtn.click();
+  });
+})();
+
+(() => {
+  const rail = document.getElementById("propertyRail");
+  const prev = document.getElementById("railPrev");
+  const next = document.getElementById("railNext");
+  if (!rail || !prev || !next) return;
+
+  function step() {
+    const card = rail.querySelector(".property-card");
+    if (!card) return 280;
+    const styles = window.getComputedStyle(rail);
+    const gap = parseFloat(styles.columnGap || styles.gap || "16") || 16;
+    return card.getBoundingClientRect().width + gap;
+  }
+
+  prev.addEventListener("click", () => {
+    rail.scrollBy({ left: step(), behavior: "smooth" });
+  });
+  next.addEventListener("click", () => {
+    rail.scrollBy({ left: -step(), behavior: "smooth" });
   });
 })();

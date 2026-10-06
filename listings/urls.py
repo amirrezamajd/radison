@@ -9,6 +9,7 @@ urlpatterns = [
     path("panel/register/", views.panel_register, name="panel_register"),
     path("panel/", views.panel, name="panel"),
     path("panel/extract/", views.panel_extract, name="panel_extract"),
+    path("panel/reextract/<int:pk>/", views.panel_reextract, name="panel_reextract"),
     path("panel/tours/upload/", views.panel_tour_upload, name="panel_tour_upload"),
     path("panel/tours/delete/<int:pk>/", views.panel_tour_delete, name="panel_tour_delete"),
     path("panel/assign-tour/<int:pk>/", views.panel_assign_tour, name="panel_assign_tour"),

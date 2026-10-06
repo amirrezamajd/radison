@@ -71,8 +71,15 @@ def download_image(remote_url: str) -> ContentFile:
     return ContentFile(BytesIO(response.content).getvalue(), name=filename)
 
 
+def _clear_property_images(property_obj: Property) -> None:
+    for image in property_obj.images.all():
+        if image.image:
+            image.image.delete(save=False)
+    property_obj.images.all().delete()
+
+
 @transaction.atomic
-def import_property_from_url(url: str) -> Property:
+def import_property_from_url(url: str, replace_property: Property | None = None) -> Property:
     token, source_url = normalize_url(url)
     html = fetch_html(source_url)
     soup = BeautifulSoup(html, "html.parser")
@@ -104,25 +111,41 @@ def import_property_from_url(url: str) -> Property:
             continue
         remote_images.append(urljoin(CRM_HOST + "/", src))
 
-    if not remote_images:
-        raise ValueError("تصویری در صفحه ملک پیدا نشد")
+    defaults = {
+        "source_url": source_url,
+        "title": title,
+        "price_text": price_text,
+        "price_per_meter_text": price_per_meter,
+        "property_type": property_type,
+        "deal_type": deal_type,
+        "specs": specs,
+    }
 
-    property_obj, _created = Property.objects.update_or_create(
-        source_token=token,
-        defaults={
-            "source_url": source_url,
-            "title": title,
-            "price_text": price_text,
-            "price_per_meter_text": price_per_meter,
-            "property_type": property_type,
-            "deal_type": deal_type,
-            "specs": specs,
-        },
-    )
+    if replace_property is not None:
+        conflict = (
+            Property.objects.filter(source_token=token)
+            .exclude(pk=replace_property.pk)
+            .exists()
+        )
+        if conflict:
+            raise ValueError("این لینک CRM قبلاً برای ملک دیگری ثبت شده است.")
+        replace_property.source_token = token
+        for field, value in defaults.items():
+            setattr(replace_property, field, value)
+        replace_property.save()
+        property_obj = replace_property
+    else:
+        property_obj, _created = Property.objects.update_or_create(
+            source_token=token,
+            defaults=defaults,
+        )
 
-    property_obj.images.all().delete()
+    _clear_property_images(property_obj)
     for index, remote_url in enumerate(remote_images):
-        image_file = download_image(remote_url)
+        try:
+            image_file = download_image(remote_url)
+        except ValueError:
+            continue
         PropertyImage.objects.create(property=property_obj, image=image_file, order=index)
 
     return property_obj

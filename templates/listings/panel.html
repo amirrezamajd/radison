@@ -76,6 +76,22 @@
                   <button class="btn btn-ghost" type="submit">ذخیره بازدید</button>
                   <a class="btn btn-ghost" href="{% url 'admin:listings_property_change' listing.id %}">ویرایش در جنگو</a>
                 </form>
+                <form class="reextract-form" method="post" action="{% url 'panel_reextract' listing.id %}" data-reextract="1">
+                  {% csrf_token %}
+                  <label class="field compact-field">
+                    <span>ویرایش با استخراج مجدد از CRM</span>
+                    <input
+                      type="url"
+                      name="url"
+                      value="{{ listing.source_url }}"
+                      placeholder="https://crmamlak.app/p/xxxxx"
+                      dir="ltr"
+                      required
+                    >
+                  </label>
+                  <button class="btn btn-primary" type="submit">استخراج و جایگزینی این ملک</button>
+                </form>
+                <div class="reextract-status status" hidden></div>
               </div>
               <form method="post" action="{% url 'panel_delete' listing.id %}" onsubmit="return confirm('این ملک حذف شود؟');">
                 {% csrf_token %}
@@ -171,5 +187,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{% static 'js/panel.js' %}?v=2"></script>
+<script src="{% static 'js/panel.js' %}?v=3"></script>
 {% endblock %}

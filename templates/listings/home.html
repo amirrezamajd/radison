@@ -40,6 +40,36 @@
   </div>
 </section>
 
+<section class="section" id="listings">
+  <div class="section-head listings-head">
+    <div>
+      <h2>فایل‌های موجود در سرخرود</h2>
+      <p>برای دیدن مشخصات و تصاویر کامل، روی هر ملک کلیک کنید.</p>
+    </div>
+    {% if properties %}
+      <a class="btn btn-primary listings-all-btn" href="{% url 'properties' %}">مشاهده همه</a>
+    {% endif %}
+  </div>
+
+  {% if properties %}
+    <div class="property-rail-shell">
+      <button type="button" class="rail-nav rail-nav-prev" id="railPrev" aria-label="قبلی">›</button>
+      <div class="property-rail-wrap">
+        <div class="property-rail" id="propertyRail">
+          {% for listing in properties %}
+            {% include "listings/includes/property_card.html" with listing=listing %}
+          {% endfor %}
+        </div>
+      </div>
+      <button type="button" class="rail-nav rail-nav-next" id="railNext" aria-label="بعدی">‹</button>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      هنوز ملکی بارگذاری نشده است. به‌زودی فایل‌های سرخرود اضافه می‌شود.
+    </div>
+  {% endif %}
+</section>
+
 <section class="section about" id="about">
   <div class="section-head">
     <h2>سرخرود کجاست؟</h2>
@@ -105,32 +135,6 @@
   </div>
 </section>
 
-<section class="section" id="listings">
-  <div class="section-head listings-head">
-    <div>
-      <h2>فایل‌های موجود در سرخرود</h2>
-      <p>ویلاها و ملک‌های منتخب را در دو ردیف ببینید؛ برای جزئیات و گالری روی هر کارت بزنید.</p>
-    </div>
-    {% if properties %}
-      <a class="btn btn-primary listings-all-btn" href="{% url 'properties' %}">مشاهده همه</a>
-    {% endif %}
-  </div>
-
-  {% if properties %}
-    <div class="property-rail-wrap">
-      <div class="property-rail" dir="rtl">
-        {% for listing in properties %}
-          {% include "listings/includes/property_card.html" with listing=listing %}
-        {% endfor %}
-      </div>
-    </div>
-  {% else %}
-    <div class="empty-state">
-      هنوز ملکی بارگذاری نشده است. به‌زودی فایل‌های سرخرود اضافه می‌شود.
-    </div>
-  {% endif %}
-</section>
-
 <section class="contact" id="contact">
   <div class="contact-inner">
     <div>
@@ -168,5 +172,5 @@
 <script>
   window.RADISON_PROPERTIES = JSON.parse(document.getElementById("properties-data").textContent);
 </script>
-<script src="{% static 'js/home.js' %}?v=3"></script>
+<script src="{% static 'js/home.js' %}?v=4"></script>
 {% endblock %}

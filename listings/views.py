@@ -201,8 +201,15 @@ def panel_extract(request):
         if selected_tour is None:
             return JsonResponse({"ok": False, "error": "بازدید مجازی انتخاب‌شده پیدا نشد"}, status=400)
 
+    replace_id = (request.POST.get("replace_property_id") or "").strip()
+    replace_property = None
+    if replace_id:
+        replace_property = Property.objects.filter(pk=replace_id).first()
+        if replace_property is None:
+            return JsonResponse({"ok": False, "error": "ملک برای ویرایش پیدا نشد"}, status=404)
+
     try:
-        property_obj = import_property_from_url(url)
+        property_obj = import_property_from_url(url, replace_property=replace_property)
         if selected_tour is not None:
             property_obj.virtual_tour = selected_tour
             property_obj.save(update_fields=["virtual_tour", "updated_at"])
@@ -212,6 +219,7 @@ def panel_extract(request):
     return JsonResponse(
         {
             "ok": True,
+            "replaced": bool(replace_property),
             "property": {
                 "id": property_obj.id,
                 "title": property_obj.title,
@@ -219,6 +227,37 @@ def panel_extract(request):
                 "images_count": property_obj.images.count(),
                 "cover": property_obj.cover_image,
                 "virtual_tour_url": property_obj.virtual_tour_url,
+            },
+        }
+    )
+
+
+@login_required(login_url="panel_login")
+@require_POST
+def panel_reextract(request, pk):
+    if not request.user.is_staff:
+        return JsonResponse({"ok": False, "error": "دسترسی غیرمجاز"}, status=403)
+
+    property_obj = get_object_or_404(Property, pk=pk)
+    url = (request.POST.get("url") or "").strip()
+    if not url:
+        return JsonResponse({"ok": False, "error": "لینک ملک CRM را وارد کنید"}, status=400)
+
+    try:
+        updated = import_property_from_url(url, replace_property=property_obj)
+    except Exception as exc:  # noqa: BLE001
+        return JsonResponse({"ok": False, "error": str(exc)}, status=400)
+
+    return JsonResponse(
+        {
+            "ok": True,
+            "replaced": True,
+            "property": {
+                "id": updated.id,
+                "title": updated.title,
+                "price_text": updated.price_text,
+                "images_count": updated.images.count(),
+                "cover": updated.cover_image,
             },
         }
     )
