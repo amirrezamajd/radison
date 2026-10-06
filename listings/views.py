@@ -34,7 +34,7 @@ def home(request):
                 "virtual_tour_name": item.virtual_tour.name if item.virtual_tour_id else "",
             }
         )
-    response = render(
+    return render(
         request,
         "listings/home.html",
         {
@@ -42,11 +42,9 @@ def home(request):
             "properties_json": payload,
         },
     )
-    response["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    response["Pragma"] = "no-cache"
-    return response
 
 
+@never_cache
 def panel_login(request):
     if request.user.is_authenticated and request.user.is_staff and request.user.is_active:
         return redirect("panel")
@@ -77,6 +75,7 @@ def panel_login(request):
     return render(request, "listings/login.html", {"error": error})
 
 
+@never_cache
 def panel_register(request):
     if request.user.is_authenticated and request.user.is_staff and request.user.is_active:
         return redirect("panel")
@@ -141,6 +140,7 @@ def panel_register(request):
 
 
 @login_required(login_url="panel_login")
+@never_cache
 def panel(request):
     if not request.user.is_staff:
         logout(request)
@@ -154,6 +154,8 @@ def panel(request):
         {
             "properties": properties,
             "tours": tours,
+            "property_count": properties.count(),
+            "tour_count": tours.count(),
         },
     )
 

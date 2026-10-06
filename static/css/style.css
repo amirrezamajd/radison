@@ -787,10 +787,14 @@ img { display: block; max-width: 100%; }
   outline: none;
 }
 
-.panel-section {
-  margin-top: 1.6rem;
-  padding-top: 1.4rem;
-  border-top: 1px solid rgba(10, 127, 135, 0.12);
+.panel-sync-note {
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(10, 127, 135, 0.08);
+  color: var(--teal-deep);
+  font-size: 0.92rem;
+  line-height: 1.7;
 }
 
 .panel-section:first-of-type {

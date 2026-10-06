@@ -23,7 +23,11 @@
       }
       statusEl.className = "status ok";
       statusEl.textContent = `ملک «${data.property.title}» با ${data.property.images_count} تصویر بارگذاری شد.`;
-      window.setTimeout(() => window.location.reload(), 900);
+      window.setTimeout(() => {
+        const url = new URL(window.location.href);
+        url.searchParams.set("t", String(Date.now()));
+        window.location.replace(url.toString());
+      }, 700);
     } catch (error) {
       statusEl.className = "status error";
       statusEl.textContent = error.message || "خطا در استخراج";

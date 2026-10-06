@@ -16,13 +16,19 @@
       </div>
       <div class="admin-top-actions">
         <a class="btn btn-ghost" href="{% url 'home' %}">مشاهده سایت</a>
+        <a class="btn btn-ghost" href="{% url 'admin:listings_property_changelist' %}">ملک‌ها در جنگو</a>
         <a class="btn btn-ghost" href="{% url 'admin:index' %}">جنگو ادمین</a>
+        <a class="btn btn-ghost" href="{% url 'panel' %}?t={{ property_count }}-{{ tour_count }}">بروزرسانی لیست</a>
         <form action="{% url 'panel_logout' %}" method="post">
           {% csrf_token %}
           <button class="btn btn-ghost" type="submit">خروج</button>
         </form>
       </div>
     </div>
+
+    <p class="panel-sync-note">
+      پنل سایت و جنگو ادمین به یک دیتابیس وصل‌اند · الان {{ property_count }} ملک و {{ tour_count }} بازدید مجازی
+    </p>
 
     <section class="panel-section" id="virtual-tours">
       <h1>بازدید مجازی</h1>
@@ -141,6 +147,7 @@
                     {% endfor %}
                   </select>
                   <button class="btn btn-ghost" type="submit">ذخیره بازدید</button>
+                  <a class="btn btn-ghost" href="{% url 'admin:listings_property_change' property.id %}">ویرایش در جنگو</a>
                 </form>
               </div>
               <form method="post" action="{% url 'panel_delete' property.id %}" onsubmit="return confirm('این ملک حذف شود؟');">
