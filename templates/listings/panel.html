@@ -55,7 +55,10 @@
               {% endwith %}
               <div class="property-item-body">
                 <h3>{{ listing.title }}</h3>
-                <p>{{ listing.price_text }} · {{ listing.images.count }} تصویر</p>
+                <p>
+                  {{ listing.price_text }} · {{ listing.images.count }} تصویر
+                  · <span class="view-count">{{ listing.view_count }} بازدید</span>
+                </p>
                 {% if listing.virtual_tour %}
                   <p class="tour-assigned">
                     بازدید:

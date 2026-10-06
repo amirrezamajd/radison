@@ -87,6 +87,7 @@ class Property(models.Model):
         related_name="properties",
         verbose_name="بازدید مجازی",
     )
+    view_count = models.PositiveIntegerField("تعداد بازدید", default=0, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

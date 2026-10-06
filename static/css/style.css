@@ -821,6 +821,11 @@ img { display: block; max-width: 100%; }
   font-size: 0.95rem;
 }
 
+.view-count {
+  color: var(--orange);
+  font-weight: 700;
+}
+
 .tour-assigned {
   margin-top: 0.35rem !important;
   color: var(--teal-deep) !important;

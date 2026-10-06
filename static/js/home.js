@@ -142,6 +142,24 @@
     nextBtn.hidden = !multi;
   }
 
+  function getCookie(name) {
+    const match = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([.$?*|{}()[\]\\/+^])/g, "\\$1") + "=([^;]*)"));
+    return match ? decodeURIComponent(match[1]) : "";
+  }
+
+  function trackView(propertyId) {
+    const csrf = getCookie("csrftoken");
+    if (!propertyId || !csrf) return;
+    fetch(`/api/properties/${propertyId}/view/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrf,
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      credentials: "same-origin",
+    }).catch(() => {});
+  }
+
   function openProperty(id) {
     current = properties.find((item) => String(item.id) === String(id));
     if (!current) return;
@@ -149,6 +167,7 @@
     render();
     backdrop.classList.add("open");
     document.body.style.overflow = "hidden";
+    trackView(id);
   }
 
   function closeModal() {

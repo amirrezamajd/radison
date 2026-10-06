@@ -2,9 +2,11 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.db.models import F
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.views.static import serve
 
@@ -16,6 +18,7 @@ User = get_user_model()
 
 
 @never_cache
+@ensure_csrf_cookie
 def home(request):
     properties = Property.objects.prefetch_related("images").select_related("virtual_tour").all()
     payload = []
@@ -32,6 +35,7 @@ def home(request):
                 "images": [image.image.url for image in item.images.all()],
                 "virtual_tour_url": item.virtual_tour_url,
                 "virtual_tour_name": item.virtual_tour.name if item.virtual_tour_id else "",
+                "view_count": item.view_count,
             }
         )
     return render(
@@ -273,6 +277,31 @@ def panel_assign_tour(request, pk):
 
 def virtual_tour_index(request, slug):
     return virtual_tour_file(request, slug, path="index.html")
+
+
+@require_POST
+@never_cache
+def track_property_view(request, pk):
+    """Count a public property open. Staff views are ignored."""
+    property_obj = get_object_or_404(Property, pk=pk)
+    if request.user.is_authenticated and request.user.is_staff:
+        return JsonResponse(
+            {
+                "ok": True,
+                "counted": False,
+                "view_count": property_obj.view_count,
+            }
+        )
+
+    Property.objects.filter(pk=pk).update(view_count=F("view_count") + 1)
+    property_obj.refresh_from_db(fields=["view_count"])
+    return JsonResponse(
+        {
+            "ok": True,
+            "counted": True,
+            "view_count": property_obj.view_count,
+        }
+    )
 
 
 def virtual_tour_file(request, slug, path):
