@@ -1,0 +1,36 @@
+<div class="modal-backdrop" id="propertyModal" role="presentation">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-gallery" id="modalGallery">
+      <div class="zoom-stage" id="zoomStage">
+        <img id="modalImage" src="" alt="">
+      </div>
+      <button type="button" class="gallery-nav prev" id="modalPrev" aria-label="قبلی">‹</button>
+      <button type="button" class="gallery-nav next" id="modalNext" aria-label="بعدی">›</button>
+      <div class="gallery-count" id="modalCount"></div>
+      <div class="zoom-controls">
+        <button type="button" id="zoomOutBtn" aria-label="کوچک‌نمایی">−</button>
+        <button type="button" id="zoomResetBtn" aria-label="بازنشانی زوم">۱۰۰٪</button>
+        <button type="button" id="zoomInBtn" aria-label="بزرگنمایی">+</button>
+      </div>
+      <p class="zoom-hint" id="zoomHint">اسکرول یا دابل‌کلیک برای زوم · درگ برای جابه‌جایی</p>
+    </div>
+    <div class="modal-body">
+      <div class="modal-top">
+        <div>
+          <div class="chip-row" id="modalChips" style="margin-bottom:0.7rem;"></div>
+          <h2 id="modalTitle"></h2>
+          <p class="modal-price">
+            <span id="modalPrice"></span>
+            <small id="modalPriceMeter"></small>
+          </p>
+        </div>
+        <button type="button" class="close-btn" id="modalClose" aria-label="بستن">✕</button>
+      </div>
+      <div class="specs" id="modalSpecs"></div>
+      <div id="modalTourWrap" class="modal-tour-wrap" hidden>
+        <a id="modalTourLink" class="btn btn-primary modal-tour-btn" href="#" target="_blank" rel="noopener">مشاهده بازدید مجازی</a>
+      </div>
+      <div class="thumbs" id="modalThumbs"></div>
+    </div>
+  </div>
+</div>

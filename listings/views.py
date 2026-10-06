@@ -17,10 +17,7 @@ from .tours import TourUploadError, delete_tour_files, extract_tour_zip
 User = get_user_model()
 
 
-@never_cache
-@ensure_csrf_cookie
-def home(request):
-    properties = Property.objects.prefetch_related("images").select_related("virtual_tour").all()
+def _properties_payload(properties):
     payload = []
     for item in properties:
         payload.append(
@@ -38,12 +35,33 @@ def home(request):
                 "view_count": item.view_count,
             }
         )
+    return payload
+
+
+@never_cache
+@ensure_csrf_cookie
+def home(request):
+    properties = Property.objects.prefetch_related("images").select_related("virtual_tour").all()
     return render(
         request,
         "listings/home.html",
         {
             "properties": properties,
-            "properties_json": payload,
+            "properties_json": _properties_payload(properties),
+        },
+    )
+
+
+@never_cache
+@ensure_csrf_cookie
+def properties(request):
+    properties_qs = Property.objects.prefetch_related("images").select_related("virtual_tour").all()
+    return render(
+        request,
+        "listings/properties.html",
+        {
+            "properties": properties_qs,
+            "properties_json": _properties_payload(properties_qs),
         },
     )
 

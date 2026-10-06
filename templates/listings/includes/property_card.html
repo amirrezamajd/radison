@@ -1,0 +1,35 @@
+<button type="button" class="property-card" data-property-id="{{ listing.id }}">
+  <div class="property-card-media">
+    {% with cover=listing.images.first %}
+      {% if cover %}
+        <img src="{{ cover.image.url }}" alt="{{ listing.title }}" loading="lazy">
+      {% else %}
+        <div class="property-card-placeholder" aria-hidden="true"></div>
+      {% endif %}
+    {% endwith %}
+    <div class="property-card-badges">
+      {% if listing.deal_type %}<span>{{ listing.deal_type }}</span>{% endif %}
+      {% if listing.virtual_tour %}<span class="is-tour">بازدید مجازی</span>{% endif %}
+    </div>
+  </div>
+  <div class="property-card-body">
+    {% if listing.property_type %}
+      <span class="property-card-type">{{ listing.property_type }}</span>
+    {% endif %}
+    <h3>{{ listing.title }}</h3>
+    <div class="property-card-price">
+      <strong>{{ listing.price_text|default:"قیمت توافقی" }}</strong>
+      {% if listing.price_per_meter_text %}
+        <small>{{ listing.price_per_meter_text }}</small>
+      {% endif %}
+    </div>
+    {% if listing.specs %}
+      <ul class="property-card-specs">
+        {% for spec in listing.specs %}
+          <li>{{ spec }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <span class="property-card-cta">مشاهده جزئیات و تصاویر</span>
+  </div>
+</button>

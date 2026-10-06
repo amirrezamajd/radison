@@ -13,6 +13,7 @@
     <a class="top-link" href="#about">سرخرود</a>
     <a class="top-link" href="#why">مزایا</a>
     <a class="top-link" href="#listings">ملک‌ها</a>
+    <a class="top-link" href="{% url 'properties' %}">همه فایل‌ها</a>
     <a class="top-link" href="#contact">تماس</a>
   </nav>
 </header>
@@ -105,32 +106,23 @@
 </section>
 
 <section class="section" id="listings">
-  <div class="section-head">
-    <h2>فایل‌های موجود در سرخرود</h2>
-    <p>برای دیدن تصاویر و مشخصات کامل، روی هر ملک کلیک کنید.</p>
+  <div class="section-head listings-head">
+    <div>
+      <h2>فایل‌های موجود در سرخرود</h2>
+      <p>ویلاها و ملک‌های منتخب را در دو ردیف ببینید؛ برای جزئیات و گالری روی هر کارت بزنید.</p>
+    </div>
+    {% if properties %}
+      <a class="btn btn-primary listings-all-btn" href="{% url 'properties' %}">مشاهده همه</a>
+    {% endif %}
   </div>
 
   {% if properties %}
-    <div class="property-grid">
-      {% for property in properties %}
-        <button type="button" class="property-tile" data-property-id="{{ property.id }}">
-          {% with cover=property.images.first %}
-            {% if cover %}
-              <img src="{{ cover.image.url }}" alt="{{ property.title }}">
-            {% endif %}
-          {% endwith %}
-          <div class="property-meta">
-            <h3>{{ property.title }}</h3>
-            <div class="price">{{ property.price_text }}</div>
-            <div class="chip-row">
-              {% if property.property_type %}<span class="chip">{{ property.property_type }}</span>{% endif %}
-              {% if property.deal_type %}<span class="chip">{{ property.deal_type }}</span>{% endif %}
-              {% if property.specs.2 %}<span class="chip">{{ property.specs.2 }}</span>{% endif %}
-              {% if property.virtual_tour %}<span class="chip chip-tour">بازدید مجازی</span>{% endif %}
-            </div>
-          </div>
-        </button>
-      {% endfor %}
+    <div class="property-rail-wrap">
+      <div class="property-rail" dir="rtl">
+        {% for listing in properties %}
+          {% include "listings/includes/property_card.html" with listing=listing %}
+        {% endfor %}
+      </div>
     </div>
   {% else %}
     <div class="empty-state">
@@ -168,42 +160,7 @@
   </p>
 </footer>
 
-<div class="modal-backdrop" id="propertyModal" role="presentation">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-gallery" id="modalGallery">
-      <div class="zoom-stage" id="zoomStage">
-        <img id="modalImage" src="" alt="">
-      </div>
-      <button type="button" class="gallery-nav prev" id="modalPrev" aria-label="قبلی">‹</button>
-      <button type="button" class="gallery-nav next" id="modalNext" aria-label="بعدی">›</button>
-      <div class="gallery-count" id="modalCount"></div>
-      <div class="zoom-controls">
-        <button type="button" id="zoomOutBtn" aria-label="کوچک‌نمایی">−</button>
-        <button type="button" id="zoomResetBtn" aria-label="بازنشانی زوم">۱۰۰٪</button>
-        <button type="button" id="zoomInBtn" aria-label="بزرگنمایی">+</button>
-      </div>
-      <p class="zoom-hint" id="zoomHint">اسکرول یا دابل‌کلیک برای زوم · درگ برای جابه‌جایی</p>
-    </div>
-    <div class="modal-body">
-      <div class="modal-top">
-        <div>
-          <div class="chip-row" id="modalChips" style="margin-bottom:0.7rem;"></div>
-          <h2 id="modalTitle"></h2>
-          <p class="modal-price">
-            <span id="modalPrice"></span>
-            <small id="modalPriceMeter"></small>
-          </p>
-        </div>
-        <button type="button" class="close-btn" id="modalClose" aria-label="بستن">✕</button>
-      </div>
-      <div class="specs" id="modalSpecs"></div>
-      <div id="modalTourWrap" class="modal-tour-wrap" hidden>
-        <a id="modalTourLink" class="btn btn-primary modal-tour-btn" href="#" target="_blank" rel="noopener">مشاهده بازدید مجازی</a>
-      </div>
-      <div class="thumbs" id="modalThumbs"></div>
-    </div>
-  </div>
-</div>
+{% include "listings/includes/property_modal.html" %}
 {% endblock %}
 
 {% block scripts %}
@@ -211,5 +168,5 @@
 <script>
   window.RADISON_PROPERTIES = JSON.parse(document.getElementById("properties-data").textContent);
 </script>
-<script src="{% static 'js/home.js' %}"></script>
+<script src="{% static 'js/home.js' %}?v=3"></script>
 {% endblock %}

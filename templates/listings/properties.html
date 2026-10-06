@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}همه فایل‌های املاک | رادیسون سرخرود{% endblock %}
+
+{% block body %}
+<header class="page-topbar">
+  <a class="brand-lockup dark" href="{% url 'home' %}" aria-label="رادیسون">
+    <img src="{% static 'img/logo-r.png' %}" alt="لوگو رادیسون" class="brand-mark">
+    <span class="brand-lockup-text">گروه سرمایه‌گذاری و مهندسی املاک رادیسون</span>
+  </a>
+  <nav class="top-nav dark" aria-label="منوی اصلی">
+    <a class="top-link" href="{% url 'home' %}#about">سرخرود</a>
+    <a class="top-link" href="{% url 'home' %}#why">مزایا</a>
+    <a class="top-link" href="{% url 'properties' %}">همه ملک‌ها</a>
+    <a class="top-link" href="{% url 'home' %}#contact">تماس</a>
+  </nav>
+</header>
+
+<section class="page-banner">
+  <div class="page-banner-inner">
+    <p class="page-eyebrow">Radison Real Estate</p>
+    <h1>همه فایل‌های موجود در سرخرود</h1>
+    <p>مشخصات کامل هر ویلا و ملک را ببینید؛ برای گالری تصاویر و بازدید مجازی روی کارت کلیک کنید.</p>
+  </div>
+</section>
+
+<section class="section properties-page">
+  {% if properties %}
+    <div class="property-grid-all">
+      {% for listing in properties %}
+        {% include "listings/includes/property_card.html" with listing=listing %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      هنوز ملکی بارگذاری نشده است. به‌زودی فایل‌های سرخرود اضافه می‌شود.
+    </div>
+  {% endif %}
+</section>
+
+<footer class="site-footer">
+  <img src="{% static 'img/logo-r.png' %}" alt="" class="footer-logo" aria-hidden="true">
+  <div class="footer-brand">کارگزاری املاک رادیسون · سرخرود، مازندران</div>
+  <a class="footer-social" href="https://instagram.com/radison.melk" target="_blank" rel="noopener">instagram.com/radison.melk</a>
+  <p class="footer-credit">
+    Designed by
+    <a href="https://instagram.com/majd.works" target="_blank" rel="noopener">@majd.works</a>
+  </p>
+</footer>
+
+{% include "listings/includes/property_modal.html" %}
+{% endblock %}
+
+{% block scripts %}
+{{ properties_json|json_script:"properties-data" }}
+<script>
+  window.RADISON_PROPERTIES = JSON.parse(document.getElementById("properties-data").textContent);
+</script>
+<script src="{% static 'js/home.js' %}?v=3"></script>
+{% endblock %}
