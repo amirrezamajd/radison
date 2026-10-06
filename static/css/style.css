@@ -456,8 +456,6 @@ img { display: block; max-width: 100%; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: grid;
-  place-items: center;
   transition: transform 0.55s ease;
 }
 
@@ -466,12 +464,17 @@ img { display: block; max-width: 100%; }
 }
 
 .property-card-empty {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0.7rem;
   background:
     radial-gradient(circle at 30% 30%, rgba(255, 87, 0, 0.22), transparent 42%),
     linear-gradient(135deg, #065f66, #0a7f87 55%, #043b40 100%);
-  color: rgba(255, 255, 255, 0.92);
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .property-card::after {
@@ -1031,14 +1034,17 @@ img { display: block; max-width: 100%; }
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  display: grid;
-  place-items: center;
 }
 
 .panel-property-empty {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0.65rem;
   background: linear-gradient(135deg, #065f66, #0a7f87);
-  color: white;
-  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.7rem;
+  font-weight: 600;
 }
 
 .panel-property-meta {
