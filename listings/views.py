@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 from django.views.static import serve
 
@@ -14,6 +15,7 @@ from .tours import TourUploadError, delete_tour_files, extract_tour_zip
 User = get_user_model()
 
 
+@never_cache
 def home(request):
     properties = Property.objects.prefetch_related("images").select_related("virtual_tour").all()
     payload = []
@@ -32,7 +34,7 @@ def home(request):
                 "virtual_tour_name": item.virtual_tour.name if item.virtual_tour_id else "",
             }
         )
-    return render(
+    response = render(
         request,
         "listings/home.html",
         {
@@ -40,6 +42,9 @@ def home(request):
             "properties_json": payload,
         },
     )
+    response["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response["Pragma"] = "no-cache"
+    return response
 
 
 def panel_login(request):
@@ -285,6 +290,9 @@ def panel_delete(request, pk):
 
     property_obj = get_object_or_404(Property, pk=pk)
     title = property_obj.title
+    for image in property_obj.images.all():
+        if image.image:
+            image.image.delete(save=False)
     property_obj.delete()
     messages.success(request, f"ملک «{title}» حذف شد.")
     return redirect("panel")

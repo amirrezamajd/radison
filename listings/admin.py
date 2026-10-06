@@ -24,6 +24,21 @@ class PropertyAdmin(admin.ModelAdmin):
     autocomplete_fields = ("virtual_tour",)
     inlines = [PropertyImageInline]
 
+    def delete_model(self, request, obj):
+        self._delete_image_files(obj)
+        super().delete_model(request, obj)
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            self._delete_image_files(obj)
+        super().delete_queryset(request, queryset)
+
+    @staticmethod
+    def _delete_image_files(property_obj):
+        for image in property_obj.images.all():
+            if image.image:
+                image.image.delete(save=False)
+
 
 @admin.register(AdminJoinRequest)
 class AdminJoinRequestAdmin(admin.ModelAdmin):
