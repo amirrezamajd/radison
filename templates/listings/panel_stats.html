@@ -80,6 +80,34 @@
       {% endif %}
     </section>
 
+    <section class="panel-section">
+      <h1>ورودی گوگل</h1>
+      <p class="sub">۳۰ روز اخیر · تشخیص جستجو، تبلیغات، دیسکاور و نقشه به‌صورت جدا</p>
+      <div class="stat-kpis google-kpis">
+        <div class="stat-kpi">
+          <span>کل ورود از گوگل</span>
+          <strong>{{ google_total }}</strong>
+          <small>{{ google_visitors }} بازدیدکننده یکتا · {{ google_share }}٪ از کل ورودها</small>
+        </div>
+      </div>
+      {% if google_sources %}
+        <ul class="stat-shares">
+          {% for row in google_sources %}
+            <li>
+              <div><span>{{ row.source }}</span><strong>{{ row.count }}</strong></div>
+              <span class="share-bar"><span style="width: {{ row.percent }}%"></span></span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty-state">هنوز ورودی گوگل ثبت نشده است.</div>
+      {% endif %}
+      <p class="stat-tip">
+        تبلیغات گوگل با <code dir="ltr">gclid</code> و جستجوی ارگانیک از روی referrer/مرورگر ثبت می‌شود.
+        داده‌های قدیمی فقط با برچسب «گوگل» دیده می‌شوند تا وقتی بازدید جدید بیاید.
+      </p>
+    </section>
+
     <div class="stat-columns">
       <section class="panel-section">
         <h1>بازدیدکننده‌ها از کجا می‌آیند؟</h1>

@@ -14,7 +14,7 @@ from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.views.static import serve
 
-from .analytics import record_property_event
+from .analytics import record_property_event, refine_page_visit_source
 from .models import AdminJoinRequest, Property, PropertyEvent, VirtualTour
 from .parsing import normalize_digits, normalize_persian
 from .scrape import import_property_from_url
@@ -603,6 +603,23 @@ def track_whatsapp_click(request, pk=None):
     property_obj = get_object_or_404(Property, pk=pk) if pk else None
     counted = record_property_event(request, property_obj, PropertyEvent.Kind.WHATSAPP)
     return JsonResponse({"ok": True, "counted": counted})
+
+
+@csrf_exempt
+@require_POST
+def track_traffic_source(request):
+    """Refine Direct hits with the browser's document.referrer / landing query."""
+    referrer = (request.POST.get("referrer") or "").strip()[:500]
+    query = (request.POST.get("query") or "").strip()[:500]
+    if request.content_type and "application/json" in request.content_type:
+        try:
+            payload = json.loads(request.body.decode("utf-8") or "{}")
+        except (TypeError, ValueError, UnicodeDecodeError):
+            payload = {}
+        referrer = (payload.get("referrer") or referrer or "").strip()[:500]
+        query = (payload.get("query") or query or "").strip()[:500]
+    updated = refine_page_visit_source(request, referrer, query)
+    return JsonResponse({"ok": True, "updated": updated})
 
 
 def page_not_found(request, exception=None):

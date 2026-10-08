@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=10">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=11">
   {% block extra_head %}{% endblock %}
   {% if GA_MEASUREMENT_ID and not user.is_staff %}
     {% block analytics %}
@@ -44,5 +44,36 @@
 <body{% block body_attrs %}{% endblock %}>
   {% block body %}{% endblock %}
   {% block scripts %}{% endblock %}
+  {% if not user.is_staff %}
+  <script>
+    (function () {
+      try {
+        var ref = document.referrer || "";
+        var qs = (location.search || "").replace(/^\?/, "");
+        var own = location.hostname.replace(/^www\./, "");
+        var external = false;
+        if (ref) {
+          var a = document.createElement("a");
+          a.href = ref;
+          var host = (a.hostname || "").replace(/^www\./, "");
+          external = host && host !== own;
+        }
+        var tagged = /(?:^|&)(gclid|gbraid|wbraid|utm_source)=/i.test(qs);
+        if (!external && !tagged) return;
+        var body = new URLSearchParams({ referrer: ref, query: qs });
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon("/api/traffic-source/", body);
+        } else {
+          fetch("/api/traffic-source/", {
+            method: "POST",
+            body: body,
+            credentials: "same-origin",
+            keepalive: true,
+          });
+        }
+      } catch (e) {}
+    })();
+  </script>
+  {% endif %}
 </body>
 </html>

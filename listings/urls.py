@@ -30,6 +30,7 @@ urlpatterns = [
     path("api/properties/<int:pk>/view/", views.track_property_view, name="track_property_view"),
     path("api/properties/<int:pk>/whatsapp/", views.track_whatsapp_click, name="track_property_whatsapp"),
     path("api/whatsapp/", views.track_whatsapp_click, name="track_whatsapp"),
+    path("api/traffic-source/", views.track_traffic_source, name="track_traffic_source"),
     path("tours/<slug:slug>/", views.virtual_tour_index, name="virtual_tour_index"),
     re_path(
         r"^tours/(?P<slug>[-a-zA-Z0-9_]+)/(?P<path>.+)$",

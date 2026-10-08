@@ -17,7 +17,7 @@ from django.utils import timezone
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 
-from .analytics import INTERNAL
+from .analytics import GOOGLE_PREFIX, INTERNAL
 from .backup import create_backup, list_backups, sqlite_path
 from .jalali import fa_digits, full_label, short_label
 from .models import PageVisit, Property, PropertyEvent
@@ -117,6 +117,15 @@ def panel_stats(request):
         entry_total,
     )
 
+    google_visits = entry_visits.filter(source__startswith=GOOGLE_PREFIX)
+    google_total = google_visits.count()
+    google_visitors = google_visits.values("visitor_id").distinct().count()
+    google_sources = _share_rows(
+        list(google_visits.values("source").annotate(count=Count("id")).order_by("-count")),
+        google_total,
+    )
+    google_share = round(google_total * 100 / entry_total) if entry_total else 0
+
     device_total = month_visits.values("visitor_id").distinct().count()
     devices = _share_rows(
         [
@@ -159,6 +168,10 @@ def panel_stats(request):
             "days": days,
             "sources": sources,
             "entry_total": entry_total,
+            "google_total": fa_digits(google_total),
+            "google_visitors": fa_digits(google_visitors),
+            "google_share": fa_digits(google_share),
+            "google_sources": google_sources,
             "devices": devices,
             "top_pages": top_pages,
             "top_properties": top_properties,

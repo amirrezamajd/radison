@@ -1707,6 +1707,10 @@ a.property-card {
 }
 
 /* Panel: stats */
+.google-kpis {
+  margin-bottom: 1rem;
+}
+
 .stat-kpis {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
